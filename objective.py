@@ -14,14 +14,12 @@ class Objective(BaseObjective):
     name = "SLOPE"
     parameters = {
         "reg": [0.5, 0.1, 0.02],
-        "q": [0.2, 0.1, 0.05],
-        "fit_intercept": [True, False],
+        "q": [0.2, 0.1, 0.05]
     }
 
-    def __init__(self, reg, q, fit_intercept):
+    def __init__(self, reg, q):
         self.q = q
         self.reg = reg
-        self.fit_intercept = fit_intercept
 
     def set_data(self, X, y):
         self.X, self.y = X, y
@@ -29,12 +27,12 @@ class Objective(BaseObjective):
         self.alphas = self._get_lambda_seq()
 
     def compute(self, res):
-        intercept, beta = res[0], res[1:]
+        beta = res
 
         X, y = self.X, self.y
         n_samples = X.shape[0]
         # compute residuals
-        diff = y - X @ beta - intercept
+        diff = y - X @ beta
 
         # compute primal
         p_obj = 1.0 / (2 * n_samples) * diff @ diff + np.sum(
@@ -50,8 +48,7 @@ class Objective(BaseObjective):
 
     def to_dict(self):
         return dict(
-            X=self.X, y=self.y, alphas=self.alphas, fit_intercept=self.fit_intercept
-        )
+            X=self.X, y=self.y, alphas=self.alphas)
 
     def _dual_norm_slope(self, theta, alphas):
         Xtheta = np.sort(np.abs(self.X.T @ theta))[::-1]
@@ -65,8 +62,5 @@ class Objective(BaseObjective):
             1 - np.arange(1, self.X.shape[1] + 1) * q / (2 * self.X.shape[1])
         )
 
-        alpha_max = self._dual_norm_slope(
-            (self.y - self.fit_intercept * np.mean(self.y)) / len(self.y), alphas_seq
-        )
-
+        alpha_max = self._dual_norm_slope(self.y / len(self.y), alphas_seq)
         return alpha_max * alphas_seq * self.reg
