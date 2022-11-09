@@ -80,7 +80,6 @@ def prox_slope(beta, lambdas):
         w[k] = s[k]
 
         while (k > 0) and (w[k - 1] <= w[k]):
-            print('oui')
             k = k - 1
             idx_j[k] = i
             s[k] += s[k + 1]
