@@ -19,9 +19,10 @@ class Solver(BaseSolver):
     install_cmd = "conda"
     requirements = ["r-base", "rpy2", "r-slope", "r-matrix"]
     references = [
-        "M. Bogdan, E. van den Berg, Chiara Sabatti, Weijie Su, and Emmanuel J.",
-        "Candès, “SLOPE – adaptive variable selection via convex optimization,” Ann",
-        "Appl Stat, vol. 9, no. 3, pp. 1103–1140, Sep. 2015, doi: 10.1214/15-AOAS842.",
+        "M. Bogdan, E. van den Berg, C. Sabatti, W. Su, and E. J. Candès, ",
+        "“SLOPE – adaptive variable selection via convex optimization,” ",
+        "Ann Appl Stat, vol. 9, no. 3, pp. 1103–1140, Sep. 2015, ",
+        "doi: 10.1214/15-AOAS842.",
     ]
     support_sparse = True
 
