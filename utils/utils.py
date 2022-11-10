@@ -1,6 +1,7 @@
 from benchopt import safe_import_context
 
 with safe_import_context() as import_ctx:
+    from numba import njit
     from scipy import sparse
     from sklearn.feature_selection import VarianceThreshold
     from sklearn.preprocessing import MaxAbsScaler, StandardScaler
@@ -21,7 +22,7 @@ def preprocess_data(X, y=None, remove_zerovar=True, standardize=True):
     return X, y
 
 
-def prox_l1sorted(beta, lambdas):
+def prox_isotonic(beta, lambdas):
     """Proximal operator of the OWL norm dot(lambdas, reversed(sort(beta)))
     Follows description and notation from:
     X. Zeng, M. Figueiredo,
@@ -60,7 +61,8 @@ def prox_l1sorted(beta, lambdas):
     return np.sign(beta) * beta_abs
 
 
-def prox_slope(beta, lambdas):
+@njit
+def prox_fast_stack(beta, lambdas):
     """Compute the sorted L1 proximal operator.
     Parameters
     ----------

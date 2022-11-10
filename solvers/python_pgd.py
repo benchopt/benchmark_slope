@@ -3,9 +3,8 @@ from benchopt import BaseSolver, safe_import_context
 with safe_import_context() as import_ctx:
     import numpy as np
     from scipy import sparse
-#    from numpy.linalg import norm
-    prox_l1sorted = import_ctx.import_from('utils', 'prox_l1sorted')
-    prox_slope = import_ctx.import_from('utils', 'prox_slope')
+    prox_isotonic = import_ctx.import_from('utils', 'prox_isotonic')
+    prox_fast_stack = import_ctx.import_from('utils', 'prox_fast_stack')
 
 
 class Solver(BaseSolver):
@@ -13,7 +12,7 @@ class Solver(BaseSolver):
     stopping_strategy = "callback"
 
     # any parameter defined here is accessible as a class attribute
-    parameters = {'prox': ['prox_l1sorted', 'prox_slope']}
+    parameters = {'prox': ['prox_isotonic', 'prox_fast_stack']}
     references = [
         'I. Daubechies, M. Defrise and C. De Mol, '
         '"An iterative thresholding algorithm for linear inverse problems '
@@ -43,27 +42,19 @@ class Solver(BaseSolver):
     def get_result(self):
         return self.w
 
-    def compute_lipschitz_constant(self):
-        if sparse.issparse(self.X):
-            L = sparse.linalg.svds(self.X, k=1)[1][0] ** 2
-        else:
-            L = np.linalg.norm(self.X, ord=2) ** 2
-        return L
-
     def run(self, callback):
         n_samples, n_features = self.X.shape
         w = np.zeros(n_features)
 
-        #if sparse.issparse(self.X):
-        #    L = sparse.linalg.svds(self.X, k=1)[1][0] ** 2 / n_samples
-        #else:
-        #    L = norm(self.X, ord=2) ** 2 / n_samples
-        L = self.compute_lipschitz_constant() / n_samples
+        if sparse.issparse(self.X):
+            L = sparse.linalg.svds(self.X, k=1)[1][0] ** 2 / n_samples
+        else:
+            L = np.linalg.norm(self.X, ord=2) ** 2 / n_samples
 
-        if self.prox == "prox_slope":
-            prox_func = prox_slope
-        elif self.prox == "prox_l1sorted":
-            prox_func = prox_l1sorted
+        if self.prox == "prox_fast_stack":
+            prox_func = prox_fast_stack
+        elif self.prox == "prox_isotonic":
+            prox_func = prox_isotonic
         else:
             raise ValueError(f"Unsupported prox {self.prox}")
 
