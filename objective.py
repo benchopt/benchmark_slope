@@ -14,7 +14,7 @@ class Objective(BaseObjective):
     name = "SLOPE"
     parameters = {
         "reg": [0.5, 0.1, 0.02],
-        "q": [0.2, 0.1, 0.05]
+        "q": [0.2, 0.1, 0.05],
     }
 
     def __init__(self, reg, q):
@@ -42,7 +42,8 @@ class Objective(BaseObjective):
         # compute dual
         theta = diff
         theta /= max(1, self._dual_norm_slope(theta, self.alphas))
-        d_obj = (norm(y) ** 2 - norm(y - theta * n_samples) ** 2) / (2 * n_samples)
+        d_obj = (norm(y) ** 2
+                 - norm(y - theta * n_samples) ** 2) / (2 * n_samples)
 
         return dict(value=p_obj, duality_gap=p_obj - d_obj)
 

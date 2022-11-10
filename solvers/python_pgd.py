@@ -3,7 +3,7 @@ from benchopt import BaseSolver, safe_import_context
 with safe_import_context() as import_ctx:
     import numpy as np
     from scipy import sparse
-    from numpy.linalg import norm
+#    from numpy.linalg import norm
     prox_l1sorted = import_ctx.import_from('utils', 'prox_l1sorted')
     prox_slope = import_ctx.import_from('utils', 'prox_slope')
 
@@ -44,43 +44,33 @@ class Solver(BaseSolver):
         return self.w
 
     def compute_lipschitz_constant(self):
-        if not sparse.issparse(self.X):
-            L = np.linalg.norm(self.X, ord=2) ** 2
-        else:
+        if sparse.issparse(self.X):
             L = sparse.linalg.svds(self.X, k=1)[1][0] ** 2
+        else:
+            L = np.linalg.norm(self.X, ord=2) ** 2
         return L
 
     def run(self, callback):
-        fit_intercept = False
         n_samples, n_features = self.X.shape
-        R = self.y.copy()
         w = np.zeros(n_features)
-        intercept = 0.0
 
-        z = w.copy()
-        t = 1
+        #if sparse.issparse(self.X):
+        #    L = sparse.linalg.svds(self.X, k=1)[1][0] ** 2 / n_samples
+        #else:
+        #    L = norm(self.X, ord=2) ** 2 / n_samples
+        L = self.compute_lipschitz_constant() / n_samples
 
-        if sparse.issparse(self.X):
-            L = sparse.linalg.svds(self.X, k=1)[1][0] ** 2 / n_samples
+        if self.prox == "prox_slope":
+            prox_func = prox_slope
+        elif self.prox == "prox_l1sorted":
+            prox_func = prox_l1sorted
         else:
-            L = norm(self.X, ord=2) ** 2 / n_samples
+            raise ValueError(f"Unsupported prox {self.prox}")
 
-        it = 0
-        if fit_intercept:
-            w = np.hstack((intercept, w))
         while callback(w):
-            if self.prox == 'prox_l1sorted':
-                w_new = prox_l1sorted(z + (self.X.T @ R) / (L * n_samples),
-                                      self.lambdas / L)
-            elif self.prox == 'prox_slope':
-                w_new = prox_slope(z + (self.X.T @ R) / (L * n_samples),
-                                        self.lambdas / L)
-
-            t_new = (1 + np.sqrt(1 + 4 * t**2)) / 2
-            z = w_new + (t - 1) / t_new * (w_new - w)
+            w_new = prox_func(w + (self.X.T @ (self.y - self.X @ w))
+                                   / (L * n_samples),
+                              self.lambdas / L)
             w = w_new
-            t = t_new
-            R[:] = self.y - self.X @ z
-            R -= intercept
-            it += 1
         self.w = w
+

@@ -21,8 +21,8 @@ def preprocess_data(X, y=None, remove_zerovar=True, standardize=True):
     return X, y
 
 
-def prox_l1sorted(v, w):
-    """Proximal operator of the OWL norm dot(w, reversed(sort(v)))
+def prox_l1sorted(beta, lambdas):
+    """Proximal operator of the OWL norm dot(lambdas, reversed(sort(beta)))
     Follows description and notation from:
     X. Zeng, M. Figueiredo,
     The ordered weighted L1 norm: Atomic formulation, dual norm,
@@ -30,20 +30,34 @@ def prox_l1sorted(v, w):
     eprint http://arxiv.org/abs/1409.4271
     (From pyowl)
     XXX
-    """
 
-    v_abs = np.abs(v)
-    ix = np.argsort(v_abs)[::-1]
-    v_abs = v_abs[ix]
+    Parameters
+    ----------
+    beta: array
+        vector of coefficients
+    lambdas: array
+        vector of regularization weights
+    
+    Returns
+    -------
+    array
+        the result of the proximal operator
+    """
+    # from https://github.com/svaiter/gslope_oracle_inequality/blob/master/graphslope/core.py
+    beta_abs = np.abs(beta)
+    ix = np.argsort(beta_abs)[::-1]
+    beta_abs = beta_abs[ix]
     # project to K+ (monotone non-negative decreasing cone)
-    v_abs = isotonic_regression(v_abs - w, y_min=0, increasing=False)
+    beta_abs = isotonic_regression(
+            beta_abs - lambdas, y_min=0, increasing=False
+            )
 
     # undo the sorting
     inv_ix = np.zeros_like(ix)
-    inv_ix[ix] = np.arange(len(v))
-    v_abs = v_abs[inv_ix]
+    inv_ix[ix] = np.arange(len(beta))
+    beta_abs = beta_abs[inv_ix]
 
-    return np.sign(v) * v_abs
+    return np.sign(beta) * beta_abs
 
 
 def prox_slope(beta, lambdas):
@@ -59,6 +73,7 @@ def prox_slope(beta, lambdas):
     array
         the result of the proximal operator
     """
+    # from https://github.com/jolars/slopecd/blob/main/code/slope/utils.py
     beta_sign = np.sign(beta)
     beta = np.abs(beta)
     ord = np.flip(np.argsort(beta))
