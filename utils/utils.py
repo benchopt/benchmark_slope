@@ -23,7 +23,8 @@ def preprocess_data(X, y=None, remove_zerovar=True, standardize=True):
 
 
 def prox_isotonic(beta, lambdas):
-    """Proximal operator of the OWL norm dot(lambdas, reversed(sort(beta)))
+    """Proximal operator of the OWL norm
+    dot(lambdas, reversed(sort(abs(beta))))
     Follows description and notation from:
     X. Zeng, M. Figueiredo,
     The ordered weighted L1 norm: Atomic formulation, dual norm,
