@@ -26,7 +26,6 @@ class Solver(BaseSolver):
 
     def set_objective(self, X, y, alphas, fit_intercept):
         self.X, self.y, self.alphas = X, y, alphas
-        self.n_samples = len(y)
         self.fit_intercept = fit_intercept
 
         self.param = SlopeParameters()
@@ -48,7 +47,7 @@ class Solver(BaseSolver):
         self.param.max_it = it
 
         self.coef_ = slope_gp(
-            self.y, self.X, 1.0, self.alphas * self.n_samples, self.param
+            self.y, self.X, 1.0, self.alphas * len(self.y), self.param
         )["sol"]
 
     def get_result(self):
