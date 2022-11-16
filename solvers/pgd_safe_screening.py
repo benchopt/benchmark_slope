@@ -30,7 +30,7 @@ class Solver(BaseSolver):
         self.fit_intercept = fit_intercept
 
         self.param = SlopeParameters()
-        self.param.accelerated = False
+        self.param.accelerated = self.accelerated
         self.param.gap_stopping = 0
         self.param.eval_gap_it = 10
         self.param.verbose = False
@@ -45,7 +45,6 @@ class Solver(BaseSolver):
         return False, None
 
     def run(self, it):
-        self.param.accelerated = self.accelerated
         self.param.max_it = it
 
         self.coef_ = slope_gp(
