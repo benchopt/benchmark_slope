@@ -9,7 +9,7 @@ with safe_import_context() as import_ctx:
 
 
 class Solver(BaseSolver):
-    name = "Safe"
+    name = "PGD_safe_screening"
     stopping_strategy = "iteration"
     install_cmd = "conda"
     requirements = [
