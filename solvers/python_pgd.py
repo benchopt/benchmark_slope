@@ -23,16 +23,21 @@ class Solver(BaseSolver):
         'vol. 2, no. 1, pp. 183-202 (2009)'
     ]
 
-    def set_objective(self, X, y, alphas):
+    def set_objective(self, X, y, alphas, fit_intercept):
         self.X, self.y, self.lambdas = X, y, alphas
-        self.fit_intercept = False
+        self.fit_intercept = fit_intercept
+
+    def skip(self, X, y, alphas, fit_intercept):
+        if fit_intercept:
+            return True, "Intercept not supported"
+        return False, None
 
     def st(self, w, mu):
         w -= np.clip(w, -mu, mu)
         return w
 
     def get_result(self):
-        return self.w
+        return np.hstack([0, self.w])
 
     def run(self, callback):
         n_samples, n_features = self.X.shape
