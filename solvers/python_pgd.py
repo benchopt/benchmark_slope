@@ -23,14 +23,6 @@ class Solver(BaseSolver):
         'vol. 2, no. 1, pp. 183-202 (2009)'
     ]
 
-    def skip(self, X, y, alphas):
-        fit_intercept = False
-        # XXX - not implemented but not too complicated to implement
-        if fit_intercept:
-            return True, f"{self.name} does not handle fit_intercept"
-
-        return False, None
-
     def set_objective(self, X, y, alphas):
         self.X, self.y, self.lambdas = X, y, alphas
         self.fit_intercept = False
@@ -59,9 +51,7 @@ class Solver(BaseSolver):
             raise ValueError(f"Unsupported prox {self.prox}")
 
         while callback(w):
-            w_new = prox_func(w + (self.X.T @ (self.y - self.X @ w))
-                                   / (L * n_samples),
-                              self.lambdas / L)
-            w = w_new
+            w = prox_func(
+                w + self.X.T @ (self.y - self.X @ w) / (L * n_samples),
+                self.lambdas / L)
         self.w = w
-
