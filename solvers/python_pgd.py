@@ -37,11 +37,12 @@ class Solver(BaseSolver):
         return w
 
     def get_result(self):
-        return np.hstack([0, self.w])
+        # this doesn't seem to be called
+        return self.w
 
     def run(self, callback):
         n_samples, n_features = self.X.shape
-        w = np.zeros(n_features)
+        w = np.zeros(n_features + 1)
 
         if sparse.issparse(self.X):
             L = sparse.linalg.svds(self.X, k=1)[1][0] ** 2 / n_samples
@@ -56,7 +57,8 @@ class Solver(BaseSolver):
             raise ValueError(f"Unsupported prox {self.prox}")
 
         while callback(w):
-            w = prox_func(
-                w + self.X.T @ (self.y - self.X @ w) / (L * n_samples),
+            w[1:] = prox_func(
+                w[1:] +
+                self.X.T @ (self.y - self.X @ w[1:]) / (L * n_samples),
                 self.lambdas / L)
-        self.w = w
+            # TODO intercept in gradient + update intercept
