@@ -15,7 +15,7 @@ class Objective(BaseObjective):
     parameters = {
         "reg": [0.5, 0.1, 0.02],
         "q": [0.2, 0.1, 0.05],
-        "fit_intercept": [True, False],
+        "fit_intercept": [False],
     }
 
     def __init__(self, reg, q, fit_intercept):
@@ -44,14 +44,15 @@ class Objective(BaseObjective):
         # compute dual
         theta = diff
         theta /= max(1, self._dual_norm_slope(theta, self.alphas))
-        d_obj = (norm(y) ** 2 - norm(y - theta * n_samples) ** 2) / (2 * n_samples)
+        d_obj = (norm(y) ** 2
+                 - norm(y - theta * n_samples) ** 2) / (2 * n_samples)
 
         return dict(value=p_obj, duality_gap=p_obj - d_obj)
 
     def to_dict(self):
         return dict(
-            X=self.X, y=self.y, alphas=self.alphas, fit_intercept=self.fit_intercept
-        )
+            X=self.X, y=self.y, alphas=self.alphas,
+            fit_intercept=self.fit_intercept)
 
     def _dual_norm_slope(self, theta, alphas):
         Xtheta = np.sort(np.abs(self.X.T @ theta))[::-1]
@@ -66,7 +67,7 @@ class Objective(BaseObjective):
         )
 
         alpha_max = self._dual_norm_slope(
-            (self.y - self.fit_intercept * np.mean(self.y)) / len(self.y), alphas_seq
+            (self.y - self.fit_intercept * np.mean(self.y)) / len(self.y),
+            alphas_seq
         )
-
         return alpha_max * alphas_seq * self.reg

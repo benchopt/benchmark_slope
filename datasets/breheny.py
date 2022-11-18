@@ -18,8 +18,6 @@ def fetch_breheny(dataset: str):
 
     path = os.path.join(base_dir, dataset + ".rds")
 
-    print("here")
-
     # download raw data unless it is stored in data folder already
     if not os.path.isfile(path):
         url = "https://s3.amazonaws.com/pbreheny-data-sets/" + dataset + ".rds"
