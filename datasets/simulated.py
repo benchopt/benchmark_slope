@@ -16,7 +16,7 @@ class Dataset(BaseDataset):
             (200, 20_000, 20, 1.0),
             (200, 2_000_000, 20, 0.001),
         ],
-        "rho": [0, 0.99],
+        "rho": [0, 0.8],
         "standardize": [True, False],
     }
 
