@@ -109,6 +109,47 @@
             ];
           }
         );
+
+        # TODO: Upstream sortedl1 to nixpkgs
+        sortedl1 = (
+          pkgs.python3.pkgs.buildPythonPackage rec {
+            pname = "sortedl1";
+            version = "1.1.0";
+            pyproject = true;
+
+            src = pkgs.fetchPypi {
+              inherit pname version;
+              hash = "sha256-bon1d6r18eayuqhhK8zAckFWGSilX3eUc213HSeO2dQ=";
+            };
+
+            dontUseCmakeConfigure = true;
+
+            build-system = [
+              pkgs.python3.pkgs.scikit-build-core
+              pkgs.python3.pkgs.pybind11
+              pkgs.cmake
+              pkgs.ninja
+            ];
+
+            dependencies = with pkgs.python3.pkgs; [
+              numpy
+              scikit-learn
+              scipy
+              furo
+              sphinx-copybutton
+              myst-parser
+              pytest
+            ];
+
+            disabledTests = [
+              "test_cdist"
+            ];
+
+            pythonImportsCheck = [
+              "sortedl1"
+            ];
+          }
+        );
       in
       {
         devShells.default = pkgs.mkShell {
@@ -124,6 +165,7 @@
               ps.numba
               libsvmdata
               benchopt
+              sortedl1
             ]))
           ];
         };
