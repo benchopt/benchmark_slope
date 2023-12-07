@@ -11,6 +11,7 @@ with safe_import_context() as import_ctx:
 
 
 class Objective(BaseObjective):
+    min_benchopt_version = "1.3"
     name = "SLOPE"
     parameters = {
         "reg": [0.5, 0.1, 0.02],
@@ -49,7 +50,7 @@ class Objective(BaseObjective):
 
         return dict(value=p_obj, duality_gap=p_obj - d_obj)
 
-    def to_dict(self):
+    def get_objective(self):
         return dict(
             X=self.X, y=self.y, alphas=self.alphas,
             fit_intercept=self.fit_intercept)
