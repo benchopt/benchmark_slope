@@ -11,8 +11,9 @@ with safe_import_context() as import_ctx:
 
 
 class Objective(BaseObjective):
-    min_benchopt_version = "1.3"
     name = "SLOPE"
+    min_benchopt_version = "1.5"
+    requirements = ["numba", "numpy", "scipy"]
     parameters = {
         "reg": [0.5, 0.1, 0.02],
         "q": [0.2, 0.1, 0.05],
@@ -29,8 +30,11 @@ class Objective(BaseObjective):
         self.n_samples, self.n_features = self.X.shape
         self.alphas = self._get_lambda_seq()
 
-    def compute(self, res):
-        intercept, beta = res[0], res[1:]
+    def get_one_result(self):
+        return dict(beta=np.zeros(self.n_features + self.fit_intercept))
+
+    def evaluate_result(self, beta):
+        intercept, beta = beta[0], beta[1:]
 
         X, y = self.X, self.y
         n_samples = X.shape[0]

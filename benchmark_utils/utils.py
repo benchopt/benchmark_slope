@@ -1,12 +1,17 @@
 from benchopt import safe_import_context
 
 with safe_import_context() as import_ctx:
-    from numba import njit
     from scipy import sparse
     from sklearn.feature_selection import VarianceThreshold
     from sklearn.preprocessing import MaxAbsScaler, StandardScaler
     import numpy as np
     from sklearn.isotonic import isotonic_regression
+    from numba import njit
+
+if import_ctx.failed_import:
+
+    def njit(f):  # noqa: F811
+        return f
 
 
 def preprocess_data(X, y=None, remove_zerovar=True, standardize=True):
@@ -22,6 +27,7 @@ def preprocess_data(X, y=None, remove_zerovar=True, standardize=True):
     return X, y
 
 
+@njit
 def prox_isotonic(beta, lambdas):
     """Proximal operator of the OWL norm
     dot(lambdas, reversed(sort(abs(beta))))
@@ -39,7 +45,7 @@ def prox_isotonic(beta, lambdas):
         vector of coefficients
     lambdas: array
         vector of regularization weights
-    
+
     Returns
     -------
     array
@@ -50,9 +56,7 @@ def prox_isotonic(beta, lambdas):
     ix = np.argsort(beta_abs)[::-1]
     beta_abs = beta_abs[ix]
     # project to K+ (monotone non-negative decreasing cone)
-    beta_abs = isotonic_regression(
-            beta_abs - lambdas, y_min=0, increasing=False
-            )
+    beta_abs = isotonic_regression(beta_abs - lambdas, y_min=0, increasing=False)
 
     # undo the sorting
     inv_ix = np.zeros_like(ix)
@@ -62,7 +66,6 @@ def prox_isotonic(beta, lambdas):
     return np.sign(beta) * beta_abs
 
 
-@njit
 def prox_fast_stack(beta, lambdas):
     """Compute the sorted L1 proximal operator.
     Parameters

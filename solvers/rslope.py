@@ -75,4 +75,6 @@ class Solver(BaseSolver):
         r_as = robjects.r["as"]
         coefs = np.array(r_as(results["coefficients"], "vector"))
 
-        return coefs if self.fit_intercept else np.hstack((np.array([0.0]), coefs))
+        coefs = coefs if self.fit_intercept else np.hstack((np.array([0.0]), coefs))
+
+        return dict(beta=coefs)

@@ -2,11 +2,10 @@ from benchopt import BaseDataset, safe_import_context
 from benchopt.datasets import make_correlated_data
 
 with safe_import_context() as import_ctx:
-    preprocess_data = import_ctx.import_from("utils", "preprocess_data")
+    from benchmark_utils import preprocess_data
 
 
 class Dataset(BaseDataset):
-
     name = "Simulated"
 
     parameters = {

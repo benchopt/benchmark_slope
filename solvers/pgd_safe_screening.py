@@ -10,7 +10,7 @@ with safe_import_context() as import_ctx:
 
 class Solver(BaseSolver):
     name = "PGD_safe_screening"
-    stopping_strategy = "iteration"
+    sampling_strategy = "iteration"
     install_cmd = "conda"
     requirements = [
         "pip:git+https://gitlab-research.centralesupelec.fr/2020elvirac/slope-screening@master"
@@ -51,4 +51,5 @@ class Solver(BaseSolver):
         )["sol"]
 
     def get_result(self):
-        return np.hstack((np.array([0.0]), self.coef_))
+        beta = np.hstack((np.array([0.0]), self.coef_))
+        return dict(beta=beta)
