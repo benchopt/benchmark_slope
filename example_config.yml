@@ -1,5 +1,6 @@
 objective:
   - SLOPE[fit_intercept=False,q=0.2,reg=0.1]
+  - SLOPE[fit_intercept=True,q=0.2,reg=0.01]
 
 dataset:
   - Simulated[X_density=1.0,n_features=200,n_samples=500]
@@ -7,6 +8,7 @@ dataset:
 solver:
   - PGD[prox=prox_fast_stack]
   - rSLOPE
+  - sortedl1
 
 # note: use more repetitions to have quantiles on the plot
 n-repetitions: 1
