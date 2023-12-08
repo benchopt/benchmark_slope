@@ -51,7 +51,8 @@ def prox_isotonic(beta, lambdas):
     array
         the result of the proximal operator
     """
-    # from https://github.com/svaiter/gslope_oracle_inequality/blob/master/graphslope/core.py
+    # from https://github.com/svaiter/gslope_oracle_inequality/
+    # blob/master/graphslope/core.py
     beta_abs = np.abs(beta)
     ix = np.argsort(beta_abs)[::-1]
     beta_abs = beta_abs[ix]
