@@ -20,7 +20,7 @@ class Dataset(BaseDataset):
     }
 
     install_cmd = "conda"
-    requirements = ["sklearn"]
+    requirements = ["scikit-learn"]
 
     def __init__(
         self,

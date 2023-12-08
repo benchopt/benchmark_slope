@@ -21,7 +21,7 @@ class Dataset(BaseDataset):
     }
 
     install_cmd = "conda"
-    requirements = ["pip:libsvmdata", "sklearn"]
+    requirements = ["pip:libsvmdata", "scikit-learn"]
 
     def __init__(self, dataset="YearPredictionMSD", standardize=True):
         self.dataset = dataset
