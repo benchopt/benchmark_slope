@@ -73,8 +73,8 @@ class Solver(BaseSolver):
     def get_result(self):
         results = dict(zip(self.fit.names, list(self.fit)))
         r_as = robjects.r["as"]
-        coefs = np.array(r_as(results["coefficients"], "vector"))
+        beta = np.array(r_as(results["coefficients"], "vector"))
 
-        coefs = coefs if self.fit_intercept else np.hstack((np.array([0.0]), coefs))
+        beta = beta if self.fit_intercept else np.hstack((np.array([0.0]), beta))
 
-        return dict(beta=coefs)
+        return dict(beta=beta)
