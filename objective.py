@@ -13,7 +13,7 @@ with safe_import_context() as import_ctx:
 class Objective(BaseObjective):
     name = "SLOPE"
     min_benchopt_version = "1.5"
-    requirements = ["numba", "numpy", "scipy", "sklearn"]
+    requirements = ["numba", "numpy", "scipy", "scikit-learn"]
     parameters = {
         "reg": [0.5, 0.1, 0.02],
         "q": [0.2, 0.1, 0.05],
