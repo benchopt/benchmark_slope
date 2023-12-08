@@ -47,7 +47,7 @@ class Dataset(BaseDataset):
     }
 
     install_cmd = "conda"
-    requirements = ["rpy2", "numpy", "scipy", "appdirs", "r"]
+    requirements = ["rpy2", "numpy", "scipy", "appdirs", "r", "sklearn"]
 
     def __init__(self, dataset="bcTCGA", standardize=True):
         self.dataset = dataset

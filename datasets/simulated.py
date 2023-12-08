@@ -19,6 +19,9 @@ class Dataset(BaseDataset):
         "standardize": [True, False],
     }
 
+    install_cmd = "conda"
+    requirements = ["sklearn"]
+
     def __init__(
         self,
         n_samples=10,
