@@ -27,7 +27,6 @@ def preprocess_data(X, y=None, remove_zerovar=True, standardize=True):
     return X, y
 
 
-@njit
 def prox_isotonic(beta, lambdas):
     """Proximal operator of the OWL norm
     dot(lambdas, reversed(sort(abs(beta))))
@@ -67,6 +66,7 @@ def prox_isotonic(beta, lambdas):
     return np.sign(beta) * beta_abs
 
 
+@njit
 def prox_fast_stack(beta, lambdas):
     """Compute the sorted L1 proximal operator.
     Parameters
