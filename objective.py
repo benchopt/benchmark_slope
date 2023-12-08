@@ -20,7 +20,7 @@ class Objective(BaseObjective):
         "fit_intercept": [False],
     }
 
-    def __init__(self, reg, q, fit_intercept):
+    def __init__(self, reg=0.1, q=0.1, fit_intercept=False):
         self.q = q
         self.reg = reg
         self.fit_intercept = fit_intercept
