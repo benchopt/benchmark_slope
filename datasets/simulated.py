@@ -5,6 +5,9 @@ from benchopt.datasets import make_correlated_data
 class Dataset(BaseDataset):
     name = "Simulated"
 
+    # TODO: Test for standardize = True too once
+    # https://github.com/benchopt/benchopt/issues/509
+    # is resolved
     parameters = {
         "n_samples, n_features, n_signals, X_density": [
             (20_000, 1_000, 40, 1.0),
