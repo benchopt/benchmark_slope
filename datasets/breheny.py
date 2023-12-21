@@ -4,7 +4,6 @@ with safe_import_context() as import_ctx:
     import os
 
     import appdirs
-    import sklearn
     import numpy as np
     from download import download
     from rpy2 import robjects

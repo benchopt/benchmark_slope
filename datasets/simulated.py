@@ -2,7 +2,6 @@ from benchopt import BaseDataset, safe_import_context
 from benchopt.datasets import make_correlated_data
 
 with safe_import_context() as import_ctx:
-    import sklearn
     from benchmark_utils import preprocess_data
 
 
