@@ -15,7 +15,8 @@ class Dataset(BaseDataset):
         "rho": [0, 0.8],
     }
 
-    requirements = ["pip:scikit-learn"]
+    install_cmd = "conda"
+    requirements = ["scikit-learn"]
 
     def __init__(
         self,
