@@ -3,7 +3,6 @@ from benchopt.datasets import make_correlated_data
 
 with safe_import_context() as import_ctx:
     from scipy import sparse
-    from sklearn.feature_selection import VarianceThreshold
     from sklearn.preprocessing import MaxAbsScaler, StandardScaler
 
 
@@ -51,8 +50,6 @@ class Dataset(BaseDataset):
             random_state=self.random_state,
             X_density=self.X_density,
         )
-
-        X = VarianceThreshold().fit_transform(X)
 
         if self.standardize:
             if sparse.issparse(X):
