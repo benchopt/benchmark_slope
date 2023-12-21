@@ -2,7 +2,7 @@ objective:
   - SLOPE[fit_intercept=False,q=0.2,reg=0.1]
 
 dataset:
-  - Simulated[X_density=1.0,n_features=200,n_samples=500,standardize=False]
+  - Simulated[X_density=1.0,n_features=200,n_samples=500,standardize=True]
 
 solver:
   - PGD[prox=prox_fast_stack]
