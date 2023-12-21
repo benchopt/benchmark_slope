@@ -1,12 +1,8 @@
-from benchopt import BaseDataset, safe_import_context
+from benchopt import BaseDataset
 from benchopt.datasets import make_correlated_data
-
-with safe_import_context() as import_ctx:
-    preprocess_data = import_ctx.import_from("utils", "preprocess_data")
 
 
 class Dataset(BaseDataset):
-
     name = "Simulated"
 
     parameters = {
@@ -17,8 +13,10 @@ class Dataset(BaseDataset):
             (200, 2_000_000, 20, 0.001),
         ],
         "rho": [0, 0.8],
-        "standardize": [True, False],
     }
+
+    install_cmd = "conda"
+    requirements = ["scikit-learn"]
 
     def __init__(
         self,
@@ -47,7 +45,5 @@ class Dataset(BaseDataset):
             random_state=self.random_state,
             X_density=self.X_density,
         )
-
-        X, y = preprocess_data(X, y, remove_zerovar=True, standardize=self.standardize)
 
         return dict(X=X, y=y)

@@ -11,15 +11,16 @@ with safe_import_context() as import_ctx:
 
 
 class Objective(BaseObjective):
-    min_benchopt_version = "1.3"
     name = "SLOPE"
+    min_benchopt_version = "1.5"
+    requirements = ["numba", "numpy", "scipy"]
     parameters = {
         "reg": [0.5, 0.1, 0.02],
         "q": [0.2, 0.1, 0.05],
         "fit_intercept": [False],
     }
 
-    def __init__(self, reg, q, fit_intercept):
+    def __init__(self, reg=0.1, q=0.1, fit_intercept=False):
         self.q = q
         self.reg = reg
         self.fit_intercept = fit_intercept
@@ -29,31 +30,33 @@ class Objective(BaseObjective):
         self.n_samples, self.n_features = self.X.shape
         self.alphas = self._get_lambda_seq()
 
-    def compute(self, res):
-        intercept, beta = res[0], res[1:]
+    def get_one_result(self):
+        return dict(beta=np.zeros(self.n_features + 1))
+
+    def evaluate_result(self, beta):
+        intercept, coefs = beta[0], beta[1:]
 
         X, y = self.X, self.y
         n_samples = X.shape[0]
         # compute residuals
-        diff = y - X @ beta - intercept
+        diff = y - X @ coefs - intercept
 
         # compute primal
         p_obj = 1.0 / (2 * n_samples) * diff @ diff + np.sum(
-            self.alphas * np.sort(np.abs(beta))[::-1]
+            self.alphas * np.sort(np.abs(coefs))[::-1]
         )
 
         # compute dual
         theta = diff
         theta /= max(1, self._dual_norm_slope(theta, self.alphas))
-        d_obj = (norm(y) ** 2
-                 - norm(y - theta * n_samples) ** 2) / (2 * n_samples)
+        d_obj = (norm(y) ** 2 - norm(y - theta * n_samples) ** 2) / (2 * n_samples)
 
         return dict(value=p_obj, duality_gap=p_obj - d_obj)
 
     def get_objective(self):
         return dict(
-            X=self.X, y=self.y, alphas=self.alphas,
-            fit_intercept=self.fit_intercept)
+            X=self.X, y=self.y, alphas=self.alphas, fit_intercept=self.fit_intercept
+        )
 
     def _dual_norm_slope(self, theta, alphas):
         Xtheta = np.sort(np.abs(self.X.T @ theta))[::-1]
@@ -68,7 +71,6 @@ class Objective(BaseObjective):
         )
 
         alpha_max = self._dual_norm_slope(
-            (self.y - self.fit_intercept * np.mean(self.y)) / len(self.y),
-            alphas_seq
+            (self.y - self.fit_intercept * np.mean(self.y)) / len(self.y), alphas_seq
         )
         return alpha_max * alphas_seq * self.reg

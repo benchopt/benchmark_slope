@@ -1,9 +1,10 @@
 from benchopt import BaseDataset, safe_import_context
 
 with safe_import_context() as import_ctx:
+    from scipy import sparse
+    from sklearn.feature_selection import VarianceThreshold
+    from sklearn.preprocessing import MaxAbsScaler, StandardScaler
     from libsvmdata import fetch_libsvm
-
-    preprocess_data = import_ctx.import_from("utils", "preprocess_data")
 
 
 class Dataset(BaseDataset):
@@ -21,7 +22,7 @@ class Dataset(BaseDataset):
     }
 
     install_cmd = "conda"
-    requirements = ["pip:libsvmdata"]
+    requirements = ["pip:libsvmdata", "scikit-learn"]
 
     def __init__(self, dataset="YearPredictionMSD", standardize=True):
         self.dataset = dataset
@@ -29,6 +30,13 @@ class Dataset(BaseDataset):
 
     def get_data(self):
         X, y = fetch_libsvm(self.dataset)
-        X, y = preprocess_data(X, y, remove_zerovar=True, standardize=self.standardize)
+
+        if self.standardize:
+            X = VarianceThreshold().fit_transform(X)
+
+            if sparse.issparse(X):
+                X = MaxAbsScaler().fit_transform(X).tocsc()
+            else:
+                X = StandardScaler().fit_transform(X)
 
         return dict(X=X, y=y)

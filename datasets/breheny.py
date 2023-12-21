@@ -9,8 +9,9 @@ with safe_import_context() as import_ctx:
     from rpy2 import robjects
     from rpy2.robjects import numpy2ri
     from scipy.sparse import csc_array
-
-    preprocess_data = import_ctx.import_from("utils", "preprocess_data")
+    from scipy import sparse
+    from sklearn.feature_selection import VarianceThreshold
+    from sklearn.preprocessing import MaxAbsScaler, StandardScaler
 
 
 def fetch_breheny(dataset: str):
@@ -47,7 +48,7 @@ class Dataset(BaseDataset):
     }
 
     install_cmd = "conda"
-    requirements = ["rpy2", "numpy", "scipy", "appdirs", "r"]
+    requirements = ["rpy2", "numpy", "scipy", "appdirs", "r", "scikit-learn"]
 
     def __init__(self, dataset="bcTCGA", standardize=True):
         self.dataset = dataset
@@ -55,6 +56,13 @@ class Dataset(BaseDataset):
 
     def get_data(self):
         X, y = fetch_breheny(self.dataset)
-        X, y = preprocess_data(X, y, remove_zerovar=True, standardize=self.standardize)
+
+        if self.standardize:
+            X = VarianceThreshold().fit_transform(X)
+
+            if sparse.issparse(X):
+                X = MaxAbsScaler().fit_transform(X).tocsc()
+            else:
+                X = StandardScaler().fit_transform(X)
 
         return dict(X=X, y=y)
