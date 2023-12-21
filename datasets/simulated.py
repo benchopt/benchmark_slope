@@ -21,8 +21,7 @@ class Dataset(BaseDataset):
         "standardize": [True, False],
     }
 
-    install_cmd = "conda"
-    requirements = ["scikit-learn"]
+    requirements = ["pip:scikit-learn"]
 
     def __init__(
         self,
