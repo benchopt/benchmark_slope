@@ -2,7 +2,9 @@ from benchopt import BaseDataset, safe_import_context
 from benchopt.datasets import make_correlated_data
 
 with safe_import_context() as import_ctx:
-    from benchmark_utils import preprocess_data
+    from scipy import sparse
+    from sklearn.feature_selection import VarianceThreshold
+    from sklearn.preprocessing import MaxAbsScaler, StandardScaler
 
 
 class Dataset(BaseDataset):
@@ -50,6 +52,12 @@ class Dataset(BaseDataset):
             X_density=self.X_density,
         )
 
-        X, y = preprocess_data(X, y, remove_zerovar=True, standardize=self.standardize)
+        if self.standardize:
+            X = VarianceThreshold().fit_transform(X)
+
+            if sparse.issparse(X):
+                X = MaxAbsScaler().fit_transform(X).tocsc()
+            else:
+                X = StandardScaler().fit_transform(X)
 
         return dict(X=X, y=y)
