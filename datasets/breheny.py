@@ -4,14 +4,14 @@ with safe_import_context() as import_ctx:
     import os
 
     import appdirs
+    import sklearn
     import numpy as np
     from download import download
     from rpy2 import robjects
     from rpy2.robjects import numpy2ri
     from scipy.sparse import csc_array
-    from scipy import sparse
-    from sklearn.feature_selection import VarianceThreshold
-    from sklearn.preprocessing import MaxAbsScaler, StandardScaler
+
+    from benchmark_utils import preprocess_data
 
 
 def fetch_breheny(dataset: str):
