@@ -14,7 +14,7 @@ class Objective(BaseObjective):
     name = "SLOPE"
     min_benchopt_version = "1.5"
     install_cmd = "conda"
-    requirements = ["numba", "numpy", "scipy", "scikit-learn"]
+    requirements = ["numba", "numpy", "scipy"]
     parameters = {
         "reg": [0.5, 0.1, 0.02],
         "q": [0.2, 0.1, 0.05],
