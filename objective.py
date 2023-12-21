@@ -31,19 +31,19 @@ class Objective(BaseObjective):
         self.alphas = self._get_lambda_seq()
 
     def get_one_result(self):
-        return dict(beta=np.zeros(self.n_features + self.fit_intercept))
+        return dict(beta=np.zeros(self.n_features + 1))
 
     def evaluate_result(self, beta):
-        intercept, beta = beta[0], beta[1:]
+        intercept, coefs = beta[0], beta[1:]
 
         X, y = self.X, self.y
         n_samples = X.shape[0]
         # compute residuals
-        diff = y - X @ beta - intercept
+        diff = y - X @ coefs - intercept
 
         # compute primal
         p_obj = 1.0 / (2 * n_samples) * diff @ diff + np.sum(
-            self.alphas * np.sort(np.abs(beta))[::-1]
+            self.alphas * np.sort(np.abs(coefs))[::-1]
         )
 
         # compute dual
