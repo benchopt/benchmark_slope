@@ -10,6 +10,8 @@ with safe_import_context() as import_ctx:
 class Solver(BaseSolver):
     name = "PGD"  # proximal gradient
     sampling_strategy = "callback"
+
+    install_cmd = "conda"
     requirements = ["numpy", "scipy", "numba", "scikit-learn"]
 
     # any parameter defined here is accessible as a class attribute
