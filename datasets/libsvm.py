@@ -1,10 +1,10 @@
 from benchopt import BaseDataset, safe_import_context
 
 with safe_import_context() as import_ctx:
-    from scipy import sparse
-    from sklearn.feature_selection import VarianceThreshold
-    from sklearn.preprocessing import MaxAbsScaler, StandardScaler
+    import sklearn
     from libsvmdata import fetch_libsvm
+
+    from benchmark_utils import preprocess_data
 
 
 class Dataset(BaseDataset):
@@ -30,13 +30,6 @@ class Dataset(BaseDataset):
 
     def get_data(self):
         X, y = fetch_libsvm(self.dataset)
-
-        X = VarianceThreshold().fit_transform(X)
-
-        if self.standardize:
-            if sparse.issparse(X):
-                X = MaxAbsScaler().fit_transform(X).tocsc()
-            else:
-                X = StandardScaler().fit_transform(X)
+        X, y = preprocess_data(X, y, remove_zerovar=True, standardize=self.standardize)
 
         return dict(X=X, y=y)
