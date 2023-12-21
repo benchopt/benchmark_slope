@@ -16,7 +16,7 @@ if import_ctx.failed_import:
 class Solver(BaseSolver):
     name = "PGD"  # proximal gradient
     sampling_strategy = "callback"
-    requirements = ["numpy", "scipy", "numba"]
+    requirements = ["numpy", "scipy", "numba", "scikit-learn"]
 
     # any parameter defined here is accessible as a class attribute
     parameters = {"prox": ["prox_isotonic", "prox_fast_stack"]}
