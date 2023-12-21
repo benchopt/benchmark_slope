@@ -15,6 +15,18 @@ class Dataset(BaseDataset):
         "rho": [0, 0.8],
     }
 
+    # TODO: Test for standardize = True too once
+    # https://github.com/benchopt/benchopt/issues/509
+    # is resolved
+    test_parameters = {
+        "n_samples, n_features, n_signals, X_density": [
+            (20_000, 1_000, 40, 1.0),
+            (200, 200_000, 20, 0.001),
+        ],
+        "rho": [0, 0.5],
+        "standardize": [False],
+    }
+
     install_cmd = "conda"
     requirements = ["scikit-learn"]
 
