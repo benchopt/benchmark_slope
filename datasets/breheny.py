@@ -9,8 +9,9 @@ with safe_import_context() as import_ctx:
     from rpy2 import robjects
     from rpy2.robjects import numpy2ri
     from scipy.sparse import csc_array
-
-    from benchmark_utils import preprocess_data
+    from scipy import sparse
+    from sklearn.feature_selection import VarianceThreshold
+    from sklearn.preprocessing import MaxAbsScaler, StandardScaler
 
 
 def fetch_breheny(dataset: str):
