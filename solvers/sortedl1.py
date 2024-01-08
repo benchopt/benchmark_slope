@@ -10,6 +10,15 @@ class Solver(BaseSolver):
     sampling_strategy = "iteration"
     install_cmd = "conda"
     requirements = ["pip:sortedl1"]
+    references = [
+        "J. Larsson, Q. Klopfenstein, M. Massias, and J. Wallin, "
+        "“Coordinate descent for SLOPE,” in Proceedings of the 26th "
+        "international conference on artificial intelligence and statistics, "
+        "F. Ruiz, J. Dy, and J.-W. van de Meent, Eds., in Proceedings of "
+        "machine learning research, vol. 206. Valencia, Spain: PMLR, Apr. 2023, "
+        "pp. 4802–4821. [Online]. Available: "
+        "https://proceedings.mlr.press/v206/larsson23a.html"
+    ]
 
     def set_objective(self, X, y, alphas, fit_intercept):
         self.X, self.y, self.lambdas = X, y, alphas
