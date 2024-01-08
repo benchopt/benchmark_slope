@@ -9,8 +9,7 @@ class Solver(BaseSolver):
     name = "sortedl1"
     sampling_strategy = "iteration"
     install_cmd = "conda"
-    # TODO: use PyPi once the package is available there
-    requirements = ["pip:git+https://github.com/jolars/sortedl1"]
+    requirements = ["pip:sortedl1"]
 
     def set_objective(self, X, y, alphas, fit_intercept):
         self.X, self.y, self.lambdas = X, y, alphas
