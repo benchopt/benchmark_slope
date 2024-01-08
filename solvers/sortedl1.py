@@ -24,7 +24,6 @@ class Solver(BaseSolver):
         self.X, self.y, self.lambdas = X, y, alphas
         self.fit_intercept = fit_intercept
 
-        # n_samples = self.X.shape[0]
         self.model = Slope(
             lam=self.lambdas,
             alpha=1.0,
