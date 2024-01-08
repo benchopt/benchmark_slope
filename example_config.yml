@@ -6,7 +6,7 @@ dataset:
   - Simulated[X_density=1.0,n_features=200,n_samples=500]
 
 solver:
-  - PGD[prox=prox_fast_stack]
+  - PGD[prox=prox_isotonic]
   - rSLOPE
   - sortedl1
 
