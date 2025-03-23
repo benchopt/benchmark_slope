@@ -3,11 +3,9 @@ Benchmark repository for SLOPE
 
 |Build Status| |Python 3.6+|
 
-This repository is based on the work of Johan Larsson, Quentin Klopfenstein and Jonas Wallin at https://github.com/Klopfe/benchmark_slope.
+This repository is based on the work of Johan Larsson, Quentin Klopfenstein, Mathurin Massias and Jonas Wallin at https://github.com/Klopfe/benchmark_slope.
 
-Benchopt is a package to simplify and make more transparent and
-reproducible the comparisons of optimization algorithms.
-Regression with the Sorted L-One Penalized Estimation (SLOPE) estimator which consists in solving the following program:
+This repository is dedicated to regression with the Sorted L-One Penalized Estimation (SLOPE) estimator which consists in solving the following program:
 
 $$ \\min_{\\beta} \\, \\tfrac{1}{2n} \\Vert y - X\\beta \\Vert^2_2 + J(\\beta, \\lambda) $$
 
@@ -31,7 +29,8 @@ This benchmark can be run using the following commands:
 
    $ pip install -U benchopt
    $ git clone https://github.com/benchopt/benchmark_slope
-   $ benchopt run ./benchmark_slope
+   $ benchopt install ./benchmark_slope
+   $ benchopt run ./benchmark_slope  -config example_config
 
 Apart from the problem, options can be passed to `benchopt run`, to restrict the benchmarks to some solvers or datasets, e.g.:
 
