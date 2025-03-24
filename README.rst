@@ -30,7 +30,7 @@ This benchmark can be run using the following commands:
    $ pip install -U benchopt
    $ git clone https://github.com/benchopt/benchmark_slope
    $ benchopt install ./benchmark_slope
-   $ benchopt run ./benchmark_slope  -config example_config
+   $ benchopt run ./benchmark_slope  --config example_config
 
 Apart from the problem, options can be passed to `benchopt run`, to restrict the benchmarks to some solvers or datasets, e.g.:
 
