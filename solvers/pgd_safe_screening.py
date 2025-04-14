@@ -13,8 +13,11 @@ class Solver(BaseSolver):
     sampling_strategy = "iteration"
     install_cmd = "conda"
     requirements = [
-        "pip::git+https://github.com/c-elvira/slopescreening"
+        "pip:git+https://github.com/c-elvira/slopescreening"
     ]
+    # TODO when benchopt 1.7 is released, update to
+    # "pip::git+https://github.com/c-elvira/slopescreening"
+
     references = [
         "C. Elvira and C. Herzet, “Safe rules for the identification of zeros in ",
         "the solutions of the SLOPE problem.” arXiv, Oct. 04, 2022. ",
