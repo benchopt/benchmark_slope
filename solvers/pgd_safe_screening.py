@@ -13,8 +13,7 @@ class Solver(BaseSolver):
     sampling_strategy = "iteration"
     install_cmd = "conda"
     requirements = [
-        "pip:git+https://gitlab-research.centralesupelec.fr/"
-        + "2020elvirac/slope-screening@master"
+        "pip::git+https://github.com/c-elvira/slopescreening"
     ]
     references = [
         "C. Elvira and C. Herzet, “Safe rules for the identification of zeros in ",
