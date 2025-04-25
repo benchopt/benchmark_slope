@@ -95,6 +95,31 @@
             dependencies = with pkgs.python3.pkgs; [
               numba
               numpy
+              scikit-learn
+            ];
+          }
+        );
+
+        # TODO: Upstream skglm to nixpkgs
+        skglm = (
+          pkgs.python3.pkgs.buildPythonPackage rec {
+            pname = "skglm";
+            version = "0.4";
+            src = pkgs.fetchPypi {
+              inherit pname version;
+              hash = "sha256-EtItwK7z92u0Ps4WvrfY/zKyr9UsunIi098+OtWWYds=";
+            };
+
+            pyproject = true;
+
+            build-system = [
+              pkgs.python3.pkgs.setuptools
+            ];
+
+            dependencies = with pkgs.python3.pkgs; [
+              numba
+              numpy
+              scikit-learn
               scipy
             ];
           }
@@ -193,6 +218,7 @@
               benchopt
               sortedl1
               slopepath
+              skglm
             ]))
           ];
         };
