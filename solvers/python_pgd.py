@@ -2,10 +2,9 @@ from benchopt import BaseSolver, safe_import_context
 
 with safe_import_context() as import_ctx:
     import numpy as np
-
+    from numba import njit
     from scipy import sparse
     from sklearn.isotonic import isotonic_regression
-    from numba import njit
 
 if import_ctx.failed_import:
 
