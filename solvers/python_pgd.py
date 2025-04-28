@@ -2,10 +2,9 @@ from benchopt import BaseSolver, safe_import_context
 
 with safe_import_context() as import_ctx:
     import numpy as np
-
+    from numba import njit
     from scipy import sparse
     from sklearn.isotonic import isotonic_regression
-    from numba import njit
 
 if import_ctx.failed_import:
 
@@ -36,11 +35,6 @@ class Solver(BaseSolver):
         self.X, self.y, self.lambdas = X, y, alphas
         self.fit_intercept = fit_intercept
 
-    def skip(self, X, y, alphas, fit_intercept):
-        if fit_intercept:
-            return True, "Intercept not supported"
-        return False, None
-
     def warm_up(self):
         self.run_once()
 
@@ -50,7 +44,7 @@ class Solver(BaseSolver):
 
     def run(self, callback):
         n_samples, n_features = self.X.shape
-        self.w = w = np.zeros(n_features + 1)
+        self.w = np.zeros(n_features + 1)
 
         if sparse.issparse(self.X):
             L = sparse.linalg.svds(self.X, k=1)[1][0] ** 2 / n_samples
@@ -65,12 +59,15 @@ class Solver(BaseSolver):
             raise ValueError(f"fUnsupported prox {self.prox}")
 
         while callback():
+            residuals = self.y - self.X @ self.w[1:] - self.w[0]
+
             self.w[1:] = prox_func(
-                w[1:] + self.X.T @ (self.y - self.X @ w[1:]) / (L * n_samples),
+                self.w[1:] + self.X.T @ residuals / (L * n_samples),
                 self.lambdas / L,
             )
-            # TODO intercept in gradient + update intercept
-            #
+
+            if self.fit_intercept:
+                self.w[0] += np.mean(residuals)
 
     def _prox_isotonic(self, beta, lambdas):
         """Proximal operator of the OWL norm
