@@ -20,7 +20,10 @@ class Solver(BaseSolver):
     requirements = ["numpy", "scipy", "numba", "scikit-learn"]
 
     # any parameter defined here is accessible as a class attribute
-    parameters = {"prox": ["prox_isotonic", "prox_fast_stack"]}
+    parameters = {
+        "prox": ["prox_isotonic", "prox_fast_stack"],
+        "acceleration": ["none", "fista"],
+    }
     references = [
         "I. Daubechies, M. Defrise and C. De Mol, "
         '"An iterative thresholding algorithm for linear inverse problems '
@@ -58,16 +61,42 @@ class Solver(BaseSolver):
         else:
             raise ValueError(f"fUnsupported prox {self.prox}")
 
-        while callback():
-            residuals = self.y - self.X @ self.w[1:] - self.w[0]
+        if self.acceleration == "fista":
+            # FISTA acceleration
+            z = np.zeros_like(self.w[1:])
+            t = 1.0
+            while callback():
+                w_prev = self.w[1:].copy()
 
-            self.w[1:] = prox_func(
-                self.w[1:] + self.X.T @ residuals / (L * n_samples),
-                self.lambdas / L,
-            )
+                # Calculate residuals based on extrapolated point z
+                residuals = self.y - self.X @ z - self.w[0]
 
-            if self.fit_intercept:
-                self.w[0] += np.mean(residuals)
+                # Update weights using proximal operator
+                self.w[1:] = prox_func(
+                    z + self.X.T @ residuals / (L * n_samples),
+                    self.lambdas / L,
+                )
+
+                # Update intercept if needed
+                if self.fit_intercept:
+                    self.w[0] += np.mean(residuals)
+
+                # Update FISTA parameters
+                t_next = (1 + np.sqrt(1 + 4 * t**2)) / 2
+                z = self.w[1:] + ((t - 1) / t_next) * (self.w[1:] - w_prev)
+                t = t_next
+        else:
+            # Standard PGD
+            while callback():
+                residuals = self.y - self.X @ self.w[1:] - self.w[0]
+
+                self.w[1:] = prox_func(
+                    self.w[1:] + self.X.T @ residuals / (L * n_samples),
+                    self.lambdas / L,
+                )
+
+                if self.fit_intercept:
+                    self.w[0] += np.mean(residuals)
 
     def _prox_isotonic(self, beta, lambdas):
         """Proximal operator of the OWL norm
