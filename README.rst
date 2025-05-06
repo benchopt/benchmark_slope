@@ -18,8 +18,6 @@ with $\\lambda_1 \\geq \\lambda_2 \\geq ... \\geq \\lambda_p$ and $\|\\beta_{(1)
 We note $n$ (or n_samples) the number of samples and $p$ (or n_features) the number of features.
 We also have that $X\\in \\mathbb{R}^{n\\times p}$ and $y\\in \\mathbb{R}^n$.
 
-
-
 Install
 --------
 
@@ -37,7 +35,6 @@ Apart from the problem, options can be passed to `benchopt run`, to restrict the
 .. code-block::
 
 	$ benchopt run ./benchmark_slope -s PGD -d simulated --max-runs 10 --n-repetitions 5
-
 
 Use `benchopt run -h` for more details about these options, or visit https://benchopt.github.io/cli.html.
 

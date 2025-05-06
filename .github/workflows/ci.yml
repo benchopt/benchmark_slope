@@ -6,13 +6,13 @@ on:
       - main
   create:
     tags:
-      - '**'
+      - "**"
   pull_request:
     branches:
       - main
   schedule:
     # Run every day at 7:42am UTC.
-    - cron:  '42 7 * * *'
+    - cron: "42 7 * * *"
 
 jobs:
   benchopt_dev:
