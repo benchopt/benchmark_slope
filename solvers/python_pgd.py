@@ -22,7 +22,7 @@ class Solver(BaseSolver):
     # any parameter defined here is accessible as a class attribute
     parameters = {
         "prox": ["prox_isotonic", "prox_fast_stack"],
-        "acceleration": ["none", "fista"],
+        "acceleration": ["none", "fista", "anderson"],
     }
     references = [
         "I. Daubechies, M. Defrise and C. De Mol, "
@@ -32,6 +32,9 @@ class Solver(BaseSolver):
         'A. Beck and M. Teboulle, "A fast iterative shrinkage-thresholding '
         'algorithm for linear inverse problems", SIAM J. Imaging Sci., '
         "vol. 2, no. 1, pp. 183-202 (2009)",
+        "Anderson, D. G. (1965). Iterative procedures for nonlinear "
+        "integral equations. J. ACM, 12(4), 547–560. "
+        "https://doi.org/10.1145/321296.321305",
     ]
 
     def set_objective(self, X, y, alphas, fit_intercept):
@@ -77,14 +80,63 @@ class Solver(BaseSolver):
                     self.lambdas / L,
                 )
 
-                # Update intercept if needed
-                if self.fit_intercept:
-                    self.w[0] += np.mean(residuals)
-
                 # Update FISTA parameters
                 t_next = (1 + np.sqrt(1 + 4 * t**2)) / 2
                 z = self.w[1:] + ((t - 1) / t_next) * (self.w[1:] - w_prev)
                 t = t_next
+
+        if self.acceleration == "anderson":
+            # Anderson acceleration
+            K = 5
+            last_K_w = np.zeros([K + 1, n_features])
+            U = np.zeros([K, n_features])
+            it = 0
+
+            while callback():
+                residuals = self.y - self.X @ self.w[1:] - self.w[0]
+                w_new = prox_func(
+                    self.w[1:] + self.X.T @ residuals / (L * n_samples),
+                    self.lambdas / L,
+                )
+
+                if it < K + 1:
+                    last_K_w[it] = w_new
+                else:
+                    for k in range(K):
+                        last_K_w[k] = last_K_w[k + 1]
+
+                    last_K_w[K] = w_new
+
+                    for k in range(K):
+                        U[k] = last_K_w[k + 1] - last_K_w[k]
+
+                    C = np.dot(U, U.T)
+
+                    try:
+                        coefs = np.linalg.solve(C, np.ones(K))
+                        c = coefs / coefs.sum()
+                        w_acc = np.sum(last_K_w[:-1] * c[:, None], axis=0)
+
+                        p_obj = np.linalg.norm(
+                            self.y - self.X @ w_new - self.w[0]
+                        ) ** 2 / (2 * n_samples) + np.sum(
+                            self.lambdas * np.sort(np.abs(w_new))[::-1]
+                        )
+                        p_obj_acc = np.linalg.norm(
+                            self.y - self.X @ w_acc - self.w[0]
+                        ) ** 2 / (2 * n_samples) + np.sum(
+                            self.lambdas * np.sort(np.abs(w_acc))[::-1]
+                        )
+
+                        if p_obj_acc < p_obj:
+                            w_new = w_acc
+
+                    except np.linalg.LinAlgError:
+                        pass
+
+                self.w[1:] = w_new
+                it += 1
+
         else:
             # Standard PGD
             while callback():
@@ -95,8 +147,8 @@ class Solver(BaseSolver):
                     self.lambdas / L,
                 )
 
-                if self.fit_intercept:
-                    self.w[0] += np.mean(residuals)
+        if self.fit_intercept:
+            self.w[0] += np.mean(residuals)
 
     def _prox_isotonic(self, beta, lambdas):
         """Proximal operator of the OWL norm
