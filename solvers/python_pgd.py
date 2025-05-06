@@ -22,7 +22,7 @@ class Solver(BaseSolver):
     # any parameter defined here is accessible as a class attribute
     parameters = {
         "prox": ["prox_isotonic", "prox_fast_stack"],
-        "acceleration": ["none", "fista"],
+        "acceleration": ["none", "fista", "bb"],
     }
     references = [
         "I. Daubechies, M. Defrise and C. De Mol, "
@@ -32,6 +32,9 @@ class Solver(BaseSolver):
         'A. Beck and M. Teboulle, "A fast iterative shrinkage-thresholding '
         'algorithm for linear inverse problems", SIAM J. Imaging Sci., '
         "vol. 2, no. 1, pp. 183-202 (2009)",
+        "Barzilai, J., & Borwein, J. M. (1988). "
+        "Two-point step size gradient methods. IMA Journal of Numerical "
+        "Analysis, 8(1), 141–148. https://doi.org/10.1093/imanum/8.1.141",
     ]
 
     def set_objective(self, X, y, alphas, fit_intercept):
@@ -77,14 +80,39 @@ class Solver(BaseSolver):
                     self.lambdas / L,
                 )
 
-                # Update intercept if needed
-                if self.fit_intercept:
-                    self.w[0] += np.mean(residuals)
-
                 # Update FISTA parameters
                 t_next = (1 + np.sqrt(1 + 4 * t**2)) / 2
                 z = self.w[1:] + ((t - 1) / t_next) * (self.w[1:] - w_prev)
                 t = t_next
+
+        elif self.acceleration == "bb":
+            # Barzilai-Borwein stepsize
+            w_old = self.w[1:].copy()
+            grad_old = np.zeros_like(w_old)
+
+            while callback():
+                residuals = self.y - self.X @ self.w[1:] - self.w[0]
+                grad = -self.X.T @ residuals / n_samples
+
+                # BB stepsize calculation
+                s = self.w[1:] - w_old
+                y = grad - grad_old
+                ss = np.dot(s, s)
+                sy = np.dot(s, y)
+
+                if sy > 1e-10:
+                    step = ss / sy  # BB1 variant
+                else:
+                    # Fallback to fixed step size if sy is too small
+                    step = 1.0 / L
+
+                # Store current values for next iteration
+                w_old[:] = self.w[1:]
+                grad_old[:] = grad
+
+                # Apply proximal step
+                self.w[1:] = prox_func(self.w[1:] - step * grad, self.lambdas * step)
+
         else:
             # Standard PGD
             while callback():
@@ -97,6 +125,9 @@ class Solver(BaseSolver):
 
                 if self.fit_intercept:
                     self.w[0] += np.mean(residuals)
+
+        if self.fit_intercept:
+            self.w[0] += np.mean(residuals)
 
     def _prox_isotonic(self, beta, lambdas):
         """Proximal operator of the OWL norm
