@@ -22,7 +22,7 @@ class Solver(BaseSolver):
     # any parameter defined here is accessible as a class attribute
     parameters = {
         "prox": ["prox_isotonic", "prox_fast_stack"],
-        "acceleration": ["none", "fista", "bb"],
+        "acceleration": ["none", "fista", "bb", "anderson"],
     }
     references = [
         "I. Daubechies, M. Defrise and C. De Mol, "
@@ -35,6 +35,9 @@ class Solver(BaseSolver):
         "Barzilai, J., & Borwein, J. M. (1988). "
         "Two-point step size gradient methods. IMA Journal of Numerical "
         "Analysis, 8(1), 141–148. https://doi.org/10.1093/imanum/8.1.141",
+        "Anderson, D. G. (1965). Iterative procedures for nonlinear "
+        "integral equations. J. ACM, 12(4), 547–560. "
+        "https://doi.org/10.1145/321296.321305",
     ]
 
     def set_objective(self, X, y, alphas, fit_intercept):
@@ -113,6 +116,58 @@ class Solver(BaseSolver):
                 # Apply proximal step
                 self.w[1:] = prox_func(self.w[1:] - step * grad, self.lambdas * step)
 
+        elif self.acceleration == "anderson":
+            # Anderson acceleration
+            K = 5
+            last_K_w = np.zeros([K + 1, n_features])
+            U = np.zeros([K, n_features])
+            it = 0
+
+            while callback():
+                residuals = self.y - self.X @ self.w[1:] - self.w[0]
+                w_new = prox_func(
+                    self.w[1:] + self.X.T @ residuals / (L * n_samples),
+                    self.lambdas / L,
+                )
+
+                if it < K + 1:
+                    last_K_w[it] = w_new
+                else:
+                    for k in range(K):
+                        last_K_w[k] = last_K_w[k + 1]
+
+                    last_K_w[K] = w_new
+
+                    for k in range(K):
+                        U[k] = last_K_w[k + 1] - last_K_w[k]
+
+                    C = np.dot(U, U.T)
+
+                    try:
+                        coefs = np.linalg.solve(C, np.ones(K))
+                        c = coefs / coefs.sum()
+                        w_acc = np.sum(last_K_w[:-1] * c[:, None], axis=0)
+
+                        p_obj = np.linalg.norm(
+                            self.y - self.X @ w_new - self.w[0]
+                        ) ** 2 / (2 * n_samples) + np.sum(
+                            self.lambdas * np.sort(np.abs(w_new))[::-1]
+                        )
+                        p_obj_acc = np.linalg.norm(
+                            self.y - self.X @ w_acc - self.w[0]
+                        ) ** 2 / (2 * n_samples) + np.sum(
+                            self.lambdas * np.sort(np.abs(w_acc))[::-1]
+                        )
+
+                        if p_obj_acc < p_obj:
+                            w_new = w_acc
+
+                    except np.linalg.LinAlgError:
+                        pass
+
+                self.w[1:] = w_new
+                it += 1
+
         else:
             # Standard PGD
             while callback():
@@ -122,9 +177,6 @@ class Solver(BaseSolver):
                     self.w[1:] + self.X.T @ residuals / (L * n_samples),
                     self.lambdas / L,
                 )
-
-                if self.fit_intercept:
-                    self.w[0] += np.mean(residuals)
 
         if self.fit_intercept:
             self.w[0] += np.mean(residuals)
