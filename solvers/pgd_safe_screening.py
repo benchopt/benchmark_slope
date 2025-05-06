@@ -1,6 +1,5 @@
 from benchopt import BaseSolver, safe_import_context
 
-
 with safe_import_context() as import_ctx:
     import numpy as np
     from scipy import sparse
@@ -12,9 +11,7 @@ class Solver(BaseSolver):
     name = "PGD_safe_screening"
     sampling_strategy = "iteration"
     install_cmd = "conda"
-    requirements = [
-        "pip:git+https://github.com/c-elvira/slopescreening"
-    ]
+    requirements = ["pip:git+https://github.com/c-elvira/slopescreening"]
     # TODO when benchopt 1.7 is released, update to
     # "pip::git+https://github.com/c-elvira/slopescreening"
 
