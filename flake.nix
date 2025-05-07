@@ -14,6 +14,32 @@
       let
         pkgs = nixpkgs.legacyPackages.${system};
 
+        slopepath = (
+          pkgs.python3.pkgs.buildPythonPackage rec {
+            pname = "slopepath";
+            version = "1.0.0";
+            src = pkgs.fetchFromGitHub {
+              inherit pname version;
+              owner = "jolars";
+              repo = "slope-path";
+              rev = "20d2bab31492b835bf31c80533a927c792b43849";
+              hash = "sha256-WVbT0fW/lhBoJgyozl/lQy+i/rH9mX+0E5SwdAUsRhw=";
+            };
+
+            pyproject = true;
+
+            build-system = [
+              pkgs.python3.pkgs.setuptools
+            ];
+
+            dependencies = with pkgs.python3.pkgs; [
+              numba
+              numpy
+              scipy
+            ];
+          }
+        );
+
         # TODO: Upstream benchopt to nixpkgs
         benchopt = (
           pkgs.python3.pkgs.buildPythonPackage rec {
@@ -63,6 +89,7 @@
               ps.scikit-learn
               ps.numba
               benchopt
+              slopepath
             ]))
           ];
         };
