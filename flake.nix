@@ -22,7 +22,7 @@
               inherit pname version;
               owner = "jolars";
               repo = "slope-path";
-              rev = "20d2bab31492b835bf31c80533a927c792b43849";
+              rev = "55165ab10079fe356ce56aef6e956750e6297060";
               hash = "sha256-WVbT0fW/lhBoJgyozl/lQy+i/rH9mX+0E5SwdAUsRhw=";
             };
 
