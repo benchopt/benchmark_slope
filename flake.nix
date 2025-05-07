@@ -14,6 +14,66 @@
       let
         pkgs = nixpkgs.legacyPackages.${system};
 
+        download = (
+          pkgs.python3.pkgs.buildPythonPackage rec {
+            pname = "download";
+            version = "0.3.5";
+            pyproject = true;
+
+            src = pkgs.fetchFromGitHub {
+              owner = "choldgraf";
+              repo = "download";
+              rev = "v${version}";
+              hash = "sha256-socNW0PhoIj0crULeTpxULhKZGCo3QpypyScFdkX4A0=";
+            };
+
+            build-system = with pkgs.python3.pkgs; [
+              setuptools
+            ];
+
+            dependencies = with pkgs.python3.pkgs; [
+              tqdm
+              six
+              requests
+            ];
+
+            pythonImportsCheck = [
+              "download"
+            ];
+          }
+        );
+
+        libsvmdata = (
+          pkgs.python3.pkgs.buildPythonPackage rec {
+            pname = "libsvmdata";
+            version = "unstable-2025-04-29";
+            pyproject = true;
+
+            src = pkgs.fetchFromGitHub {
+              owner = "mathurinm";
+              repo = "libsvmdata";
+              rev = "1533b6de47bbdef6f8df9ae78b3226d473965416";
+              hash = "sha256-xWXiTyc6UNIS4zRstY0Yw4hl+qeqal+o7r0BrGudOIE=";
+            };
+
+            build-system = with pkgs.python3.pkgs; [
+              setuptools
+              wheel
+            ];
+
+            dependencies = with pkgs.python3.pkgs; [
+              download
+              numpy
+              scikit-learn
+              scipy
+            ];
+
+            pythonImportsCheck = [
+              "libsvmdata"
+            ];
+          }
+        );
+
         # TODO: Upstream benchopt to nixpkgs
         benchopt = (
           pkgs.python3.pkgs.buildPythonPackage rec {
@@ -62,6 +122,7 @@
               })
               ps.scikit-learn
               ps.numba
+              libsvmdata
               benchopt
             ]))
           ];
