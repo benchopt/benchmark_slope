@@ -124,6 +124,7 @@
               ps.numba
               libsvmdata
               benchopt
+              slopepath
             ]))
           ];
         };
