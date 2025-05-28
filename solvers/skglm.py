@@ -32,7 +32,7 @@ class Solver(BaseSolver):
         warnings.filterwarnings("ignore", category=ConvergenceWarning)
         warnings.filterwarnings("ignore", category=FutureWarning)
         self.model = GeneralizedLinearEstimator(
-            Quadratic(), SLOPE(alphas), FISTA(opt_strategy="fixpoint")
+            Quadratic(), SLOPE(alphas), FISTA(opt_strategy="fixpoint", tol=1e-20)
         )
 
         # Cache Numba compilation
