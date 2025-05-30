@@ -1,4 +1,5 @@
 from benchopt import BaseSolver, safe_import_context
+from benchopt.stopping_criterion import INFINITY
 
 with safe_import_context() as import_ctx:
     import numpy as np
@@ -7,9 +8,10 @@ with safe_import_context() as import_ctx:
 
 class Solver(BaseSolver):
     name = "sortedl1"
-    sampling_strategy = "iteration"
+    sampling_strategy = "tolerance"
     install_cmd = "conda"
     requirements = ["pip:sortedl1"]
+
     references = [
         "J. Larsson, Q. Klopfenstein, M. Massias, and J. Wallin, "
         "“Coordinate descent for SLOPE,” in Proceedings of the 26th "
@@ -25,14 +27,17 @@ class Solver(BaseSolver):
         self.fit_intercept = fit_intercept
 
         self.model = Slope(
-            lam=self.lambdas, alpha=1.0, fit_intercept=self.fit_intercept, tol=1e-16
+            lam=self.lambdas,
+            alpha=1.0,
+            fit_intercept=self.fit_intercept,
+            max_iter=1_000_000,
         )
 
-    def run(self, n_iter):
-        if n_iter == 0:
+    def run(self, tol):
+        if tol == INFINITY:
             self.coef = np.zeros(self.X.shape[1] + 1)
         else:
-            self.model.max_iter = n_iter
+            self.model.tol = tol
             self.model.fit(self.X, self.y)
 
             coef = self.model.coef_.flatten()
