@@ -8,8 +8,8 @@ with safe_import_context() as import_ctx:
     import numpy as np
     from rpy2 import robjects
     from rpy2.robjects import numpy2ri
-    from scipy.sparse import csc_array
     from scipy import sparse
+    from scipy.sparse import csc_array
     from sklearn.feature_selection import VarianceThreshold
     from sklearn.preprocessing import MaxAbsScaler, StandardScaler
 
@@ -22,7 +22,9 @@ def fetch_breheny(dataset: str):
     # download raw data unless it is stored in data folder already
     if not os.path.isfile(path):
         os.makedirs(os.path.dirname(path), exist_ok=True)
-        url = f"https://github.com/IowaBiostat/data-sets/raw/main/{dataset}/{dataset}.rds"
+        url = (
+            f"https://github.com/IowaBiostat/data-sets/raw/main/{dataset}/{dataset}.rds"
+        )
         urllib.request.urlretrieve(url, path)
 
     read_rds = robjects.r["readRDS"]
