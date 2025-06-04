@@ -214,6 +214,7 @@
               })
               ps.scikit-learn
               ps.numba
+              ps.appdirs
               libsvmdata
               benchopt
               sortedl1
