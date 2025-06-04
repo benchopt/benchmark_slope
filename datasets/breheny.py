@@ -2,10 +2,10 @@ from benchopt import BaseDataset, safe_import_context
 
 with safe_import_context() as import_ctx:
     import os
+    import urllib.request
 
     import appdirs
     import numpy as np
-    from download import download
     from rpy2 import robjects
     from rpy2.robjects import numpy2ri
     from scipy.sparse import csc_array
@@ -21,8 +21,9 @@ def fetch_breheny(dataset: str):
 
     # download raw data unless it is stored in data folder already
     if not os.path.isfile(path):
-        url = "https://s3.amazonaws.com/pbreheny-data-sets/" + dataset + ".rds"
-        download(url, path)
+        os.makedirs(os.path.dirname(path), exist_ok=True)
+        url = f"https://github.com/IowaBiostat/data-sets/raw/main/{dataset}/{dataset}.rds"
+        urllib.request.urlretrieve(url, path)
 
     read_rds = robjects.r["readRDS"]
     numpy2ri.activate()
@@ -43,14 +44,14 @@ class Dataset(BaseDataset):
     name = "breheny"
 
     parameters = {
-        "dataset": ["bcTCGA", "Rhee2006", "Scheetz2006"],
+        "dataset": ["brca1", "Rhee2006", "Scheetz2006"],
         "standardize": [True, False],
     }
 
     install_cmd = "conda"
     requirements = ["rpy2", "numpy", "scipy", "appdirs", "r", "scikit-learn"]
 
-    def __init__(self, dataset="bcTCGA", standardize=True):
+    def __init__(self, dataset="brca1", standardize=True):
         self.dataset = dataset
         self.standardize = standardize
 
