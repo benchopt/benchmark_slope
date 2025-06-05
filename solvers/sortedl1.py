@@ -47,5 +47,12 @@ class Solver(BaseSolver):
             else:
                 self.coef = np.hstack(([0.0], coef))
 
+    @staticmethod
+    def get_next(prev_tol):
+        if prev_tol == INFINITY:
+            return 0.1
+        else:
+            return prev_tol / 5
+
     def get_result(self):
         return dict(beta=self.coef)
