@@ -1,5 +1,5 @@
 from benchopt import BaseSolver, safe_import_context
-from benchopt.stopping_criterion import INFINITY
+from benchopt.stopping_criterion import INFINITY, SufficientProgressCriterion
 
 with safe_import_context() as import_ctx:
     import numpy as np
@@ -8,7 +8,9 @@ with safe_import_context() as import_ctx:
 
 class Solver(BaseSolver):
     name = "sortedl1"
-    sampling_strategy = "tolerance"
+    stopping_criterion = SufficientProgressCriterion(
+        patience=5, eps=1e-38, strategy="tolerance"
+    )
     install_cmd = "conda"
     requirements = ["pip:sortedl1"]
 
