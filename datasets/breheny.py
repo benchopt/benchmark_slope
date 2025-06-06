@@ -15,7 +15,7 @@ with safe_import_context() as import_ctx:
 
 
 def fetch_breheny(dataset: str):
-    base_dir = appdirs.user_cache_dir("benchmark_lasso_path")
+    base_dir = appdirs.user_cache_dir("benchmark_slope")
 
     path = os.path.join(base_dir, dataset + ".rds")
 
