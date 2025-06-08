@@ -88,6 +88,9 @@ class Solver(BaseSolver):
                 z = self.w[1:] + ((t - 1) / t_next) * (self.w[1:] - w_prev)
                 t = t_next
 
+                if self.fit_intercept:
+                    self.w[0] += np.mean(residuals)
+
         elif self.acceleration == "bb":
             # Barzilai-Borwein stepsize
             w_old = self.w[1:].copy()
@@ -115,6 +118,9 @@ class Solver(BaseSolver):
 
                 # Apply proximal step
                 self.w[1:] = prox_func(self.w[1:] - step * grad, self.lambdas * step)
+
+                if self.fit_intercept:
+                    self.w[0] += np.mean(residuals)
 
         elif self.acceleration == "anderson":
             # Anderson acceleration
@@ -168,6 +174,9 @@ class Solver(BaseSolver):
                 self.w[1:] = w_new
                 it += 1
 
+                if self.fit_intercept:
+                    self.w[0] += np.mean(residuals)
+
         else:
             # Standard PGD
             while callback():
@@ -178,8 +187,8 @@ class Solver(BaseSolver):
                     self.lambdas / L,
                 )
 
-        if self.fit_intercept:
-            self.w[0] += np.mean(residuals)
+                if self.fit_intercept:
+                    self.w[0] += np.mean(residuals)
 
     def _prox_isotonic(self, beta, lambdas):
         """Proximal operator of the OWL norm
