@@ -55,5 +55,11 @@ class Solver(BaseSolver):
     def get_next(self, stop_val):
         return stop_val + 1
 
+    def skip(self, X, y, alphas, fit_intercept):
+        if fit_intercept:
+            return True, f"{self.name} does not handle intercept fitting"
+
+        return False, None
+
     def get_result(self):
         return dict(beta=self.coef)
