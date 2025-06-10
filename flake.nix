@@ -43,6 +43,40 @@
           }
         );
 
+        slopescreening = (
+          pkgs.python3.pkgs.buildPythonPackage {
+            pname = "slopescreening";
+            version = "2.0.0";
+
+            src = pkgs.fetchFromGitHub {
+              owner = "c-elvira";
+              repo = "slopescreening";
+              rev = "4e20cf95cc5be23f4bb8e5ed6c1b98f34fc1867a";
+              hash = "sha256-wIDDC8FLNf0TZ//pdzTNbZMNPZtcn5E94eFmOqkxgCU=";
+            };
+
+            pyproject = true;
+
+            build-system = with pkgs.python3.pkgs; [
+              setuptools
+              numpy
+              scipy
+              cython
+            ];
+
+            dependencies = with pkgs.python3.pkgs; [
+              pyparsing
+              python-dateutil
+              scikit-learn
+              matplotlib
+            ];
+
+            pythonImportsCheck = [
+              "slopescreening"
+            ];
+          }
+        );
+
         libsvmdata = (
           pkgs.python3.pkgs.buildPythonPackage rec {
             pname = "libsvmdata";
@@ -220,6 +254,7 @@
               sortedl1
               slopepath
               skglm
+              slopescreening
             ]))
           ];
         };
