@@ -52,7 +52,8 @@ class Solver(BaseSolver):
         if prev_tol == INFINITY:
             return 0.1
         else:
-            return prev_tol / 5
+            tol = max(prev_tol / 5, 1e-7)
+            return tol
 
     def get_result(self):
         return dict(beta=self.coef)
