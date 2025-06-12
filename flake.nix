@@ -240,6 +240,7 @@
         devShells.default = pkgs.mkShell {
           packages = [
             pkgs.bashInteractive
+            pkgs.rWrapper
             (pkgs.python3.withPackages (ps: [
               (ps.rpy2.override {
                 extraRPackages = with pkgs.rPackages; [
