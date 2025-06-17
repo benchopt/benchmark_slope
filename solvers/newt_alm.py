@@ -231,8 +231,7 @@ class Solver(BaseSolver):
                 )
             else:
                 np.fill_diagonal(WTW, WTW.diagonal() + 1)
-                V_inv = -(W @ solve(WTW, W.T))
-                np.fill_diagonal(V_inv, V_inv.diagonal() + 1)
+                V_inv = np.eye(m) - W @ solve(WTW, W.T)
 
             d = V_inv @ (-nabla_psi)
         elif inner_solver == "cg":
