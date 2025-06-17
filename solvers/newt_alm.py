@@ -54,7 +54,7 @@ class Solver(BaseSolver):
 
         line_search_param = {"mu": 0.2, "delta": 0.5, "beta": 2}
         local_param = {"epsilon": 1.0, "delta": 1.0, "delta_prime": 1.0, "sigma": 0.5}
-        max_inner_it = 50
+        max_inner_it = 100
 
         A = self.X
         b = self.y
@@ -210,15 +210,15 @@ class Solver(BaseSolver):
 
         W = self._build_W(x_tilde, sigma, lambdas, A)
 
-        m, r1_plus_r2 = W.shape
+        m, n = W.shape
 
         inner_solver = copy.deepcopy(self.inner_solver)
 
         if inner_solver == "auto":
-            if r1_plus_r2 <= 100 * m:
-                inner_solver = "woodbury"
-            elif m > 10_000 and m / r1_plus_r2 > 0.1:
+            if m > 10000:  # Very large m - avoid forming m×m matrices
                 inner_solver = "cg"
+            elif m >= 3 * n and n < 5000:
+                inner_solver = "woodbury"
             else:
                 inner_solver = "standard"
 
@@ -227,26 +227,35 @@ class Solver(BaseSolver):
             WTW = W.T @ W
             if sparse.issparse(A):
                 V_inv = sparse.eye(m, format="csc") - W @ spsolve(
-                    sparse.eye(r1_plus_r2, format="csc") + WTW, W.T
+                    sparse.eye(n, format="csc") + WTW, W.T
                 )
             else:
                 np.fill_diagonal(WTW, WTW.diagonal() + 1)
-                V_inv = -(W @ solve(WTW, W.T))
-                np.fill_diagonal(V_inv, V_inv.diagonal() + 1)
+                V_inv = np.eye(m) - W @ solve(WTW, W.T)
 
             d = V_inv @ (-nabla_psi)
         elif inner_solver == "cg":
-            # Conjugate gradient
-            V = W @ W.T
-            if sparse.issparse(A):
-                V += sparse.eye(m, format="csc")
+
+            def matvec(x):
+                # Compute (I + W*W.T)*x without forming W*W.T explicitly
+                return x + W @ (W.T @ x)
+
+            V_op = sparse.linalg.LinearOperator(
+                shape=(m, m), matvec=matvec, dtype=W.dtype
+            )
+
+            # Diagonal preconditioner (approximation of diagonal of I + W*W.T)
+            diag_precond = np.ones(m)
+            if sparse.issparse(W):
+                # Compute row-wise sum of squares without using power method
+                W_squared = W.copy()
+                W_squared.data = W_squared.data**2
+                diag_precond += np.array(W_squared.sum(axis=1)).flatten()
             else:
-                np.fill_diagonal(V, V.diagonal() + 1)
+                diag_precond += np.sum(W**2, axis=1)
+            M = sparse.diags(diag_precond)
 
-            # preconditioner
-            M = sparse.diags(V.diagonal())
-
-            d, _ = cg(V, -nabla_psi, M=M)
+            d, _ = cg(V_op, -nabla_psi, M=M)
         else:
             V = W @ W.T
             if sparse.issparse(A):
@@ -333,20 +342,6 @@ def _nonzero_sign(x):
     return out
 
 
-def _permutation_matrix(x):
-    n = len(x)
-
-    signs = _nonzero_sign(x)
-    order = np.argsort(np.abs(x))[::-1]
-
-    pi = sparse.lil_matrix((n, n), dtype=int)
-
-    for j, ord_j in enumerate(order):
-        pi[j, ord_j] = signs[ord_j]
-
-    return sparse.csc_array(pi)
-
-
 # build the signedpermutation object
 @njit
 def _build_pi(x):
@@ -374,12 +369,6 @@ def _pix(x, pi_list):
 # inverse of the matrix B.T
 def _BTinv(x):
     return np.cumsum(x)
-
-
-# inverse of the matrix B
-@njit
-def _Binv(x):
-    return np.cumsum(x[::-1])[::-1]
 
 
 @njit
