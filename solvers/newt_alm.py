@@ -235,17 +235,27 @@ class Solver(BaseSolver):
 
             d = V_inv @ (-nabla_psi)
         elif inner_solver == "cg":
-            # Conjugate gradient
-            V = W @ W.T
-            if sparse.issparse(A):
-                V += sparse.eye(m, format="csc")
+
+            def matvec(x):
+                # Compute (I + W*W.T)*x without forming W*W.T explicitly
+                return x + W @ (W.T @ x)
+
+            V_op = sparse.linalg.LinearOperator(
+                shape=(m, m), matvec=matvec, dtype=W.dtype
+            )
+
+            # Diagonal preconditioner (approximation of diagonal of I + W*W.T)
+            diag_precond = np.ones(m)
+            if sparse.issparse(W):
+                # Compute row-wise sum of squares without using power method
+                W_squared = W.copy()
+                W_squared.data = W_squared.data**2
+                diag_precond += np.array(W_squared.sum(axis=1)).flatten()
             else:
-                np.fill_diagonal(V, V.diagonal() + 1)
+                diag_precond += np.sum(W**2, axis=1)
+            M = sparse.diags(diag_precond)
 
-            # preconditioner
-            M = sparse.diags(V.diagonal())
-
-            d, _ = cg(V, -nabla_psi, M=M)
+            d, _ = cg(V_op, -nabla_psi, M=M)
         else:
             V = W @ W.T
             if sparse.issparse(A):
