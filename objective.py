@@ -51,7 +51,11 @@ class Objective(BaseObjective):
         theta /= max(1, self._dual_norm_slope(theta, self.alphas))
         d_obj = (norm(y) ** 2 - norm(y - theta * n_samples) ** 2) / (2 * n_samples)
 
-        return dict(value=p_obj, duality_gap=p_obj - d_obj)
+        return dict(
+            value=p_obj,
+            duality_gap=p_obj - d_obj,
+            rel_duality_gap=(p_obj - d_obj) / (1e-10 + np.abs(p_obj)),
+        )
 
     def get_objective(self):
         return dict(
