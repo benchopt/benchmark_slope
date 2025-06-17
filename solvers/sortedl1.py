@@ -11,6 +11,10 @@ class Solver(BaseSolver):
     sampling_strategy = "tolerance"
     install_cmd = "conda"
     requirements = ["pip:sortedl1"]
+    parameters = {
+        "cd_type": ["cyclical", "permuted"],
+        "update_clusters": [True, False],
+    }
 
     references = [
         "J. Larsson, Q. Klopfenstein, M. Massias, and J. Wallin, "
@@ -31,6 +35,8 @@ class Solver(BaseSolver):
             alpha=1.0,
             fit_intercept=self.fit_intercept,
             max_iter=1_000_000,
+            hybrid_cd_type=self.cd_type,
+            update_clusters=self.update_clusters,
         )
 
     def run(self, tol):
