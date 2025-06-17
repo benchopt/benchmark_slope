@@ -342,20 +342,6 @@ def _nonzero_sign(x):
     return out
 
 
-def _permutation_matrix(x):
-    n = len(x)
-
-    signs = _nonzero_sign(x)
-    order = np.argsort(np.abs(x))[::-1]
-
-    pi = sparse.lil_matrix((n, n), dtype=int)
-
-    for j, ord_j in enumerate(order):
-        pi[j, ord_j] = signs[ord_j]
-
-    return sparse.csc_array(pi)
-
-
 # build the signedpermutation object
 @njit
 def _build_pi(x):
@@ -383,12 +369,6 @@ def _pix(x, pi_list):
 # inverse of the matrix B.T
 def _BTinv(x):
     return np.cumsum(x)
-
-
-# inverse of the matrix B
-@njit
-def _Binv(x):
-    return np.cumsum(x[::-1])[::-1]
 
 
 @njit
