@@ -215,10 +215,10 @@ class Solver(BaseSolver):
         inner_solver = copy.deepcopy(self.inner_solver)
 
         if inner_solver == "auto":
-            if r1_plus_r2 <= 100 * m:
-                inner_solver = "woodbury"
-            elif m > 10_000 and m / r1_plus_r2 > 0.1:
+            if m > 10000:  # Very large m - avoid forming m×m matrices
                 inner_solver = "cg"
+            elif m >= 3 * r1_plus_r2 and r1_plus_r2 < 5000:
+                inner_solver = "woodbury"
             else:
                 inner_solver = "standard"
 
