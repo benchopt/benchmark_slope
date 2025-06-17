@@ -54,7 +54,7 @@ class Solver(BaseSolver):
 
         line_search_param = {"mu": 0.2, "delta": 0.5, "beta": 2}
         local_param = {"epsilon": 1.0, "delta": 1.0, "delta_prime": 1.0, "sigma": 0.5}
-        max_inner_it = 50
+        max_inner_it = 100
 
         A = self.X
         b = self.y
