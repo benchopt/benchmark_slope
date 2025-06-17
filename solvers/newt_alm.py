@@ -210,14 +210,14 @@ class Solver(BaseSolver):
 
         W = self._build_W(x_tilde, sigma, lambdas, A)
 
-        m, r1_plus_r2 = W.shape
+        m, n = W.shape
 
         inner_solver = copy.deepcopy(self.inner_solver)
 
         if inner_solver == "auto":
             if m > 10000:  # Very large m - avoid forming m×m matrices
                 inner_solver = "cg"
-            elif m >= 3 * r1_plus_r2 and r1_plus_r2 < 5000:
+            elif m >= 3 * n and n < 5000:
                 inner_solver = "woodbury"
             else:
                 inner_solver = "standard"
@@ -227,7 +227,7 @@ class Solver(BaseSolver):
             WTW = W.T @ W
             if sparse.issparse(A):
                 V_inv = sparse.eye(m, format="csc") - W @ spsolve(
-                    sparse.eye(r1_plus_r2, format="csc") + WTW, W.T
+                    sparse.eye(n, format="csc") + WTW, W.T
                 )
             else:
                 np.fill_diagonal(WTW, WTW.diagonal() + 1)
