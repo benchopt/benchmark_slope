@@ -25,6 +25,7 @@ class Dataset(BaseDataset):
     requirements = ["pip:libsvmdata", "scikit-learn"]
 
     def __init__(self, dataset="YearPredictionMSD", standardize=True):
+        super().__init__()
         self.dataset = dataset
         self.standardize = standardize
 
