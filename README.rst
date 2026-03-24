@@ -1,7 +1,7 @@
 Benchmark Repository for SLOPE
 ==============================
 
-|Build Status| |Python 3.6+|
+|Build Status| |Python 3.9+|
 
 This repository is dedicated to regression with the Sorted L-One Penalized Estimation (SLOPE) estimator which consists in solving the following program:
 
