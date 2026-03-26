@@ -6,7 +6,7 @@ dataset:
 
 solver:
   - PGD[prox=prox_isotonic]
-  - skglm
+  - sortedl1
 
 # note: use more repetitions to have quantiles on the plot
 n-repetitions: 1
