@@ -11,9 +11,7 @@ class Solver(BaseSolver):
     name = "PGD_safe_screening"
     sampling_strategy = "iteration"
     install_cmd = "conda"
-    requirements = ["pip:git+https://github.com/c-elvira/slopescreening"]
-    # TODO when benchopt 1.7 is released, update to
-    # "pip::git+https://github.com/c-elvira/slopescreening"
+    requirements = ["pip::git+https://github.com/c-elvira/slopescreening"]
 
     references = [
         "C. Elvira and C. Herzet, “Safe rules for the identification of zeros in ",
