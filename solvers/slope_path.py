@@ -10,9 +10,7 @@ class Solver(BaseSolver):
     name = "SlopePath"
     sampling_strategy = "iteration"
     install_cmd = "conda"
-    requirements = ["pip:git+https://github.com/jolars/slope-path"]
-    # TODO when benchopt 1.7 is released, update to
-    # "pip::git..."
+    requirements = ["pip::git+https://github.com/jolars/slope-path"]
 
     references = [
         "Dupuis, X., & Tardivel, P. (2024). The solution path of SLOPE. "
