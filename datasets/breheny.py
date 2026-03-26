@@ -51,7 +51,7 @@ class Dataset(BaseDataset):
     }
 
     install_cmd = "conda"
-    requirements = ["rpy2", "numpy", "scipy", "appdirs", "r", "scikit-learn"]
+    requirements = ["rpy2", "numpy", "scipy", "appdirs", "r-base", "scikit-learn"]
 
     def __init__(self, dataset="brca1", standardize=True):
         super().__init__()
