@@ -28,11 +28,12 @@ def fetch_breheny(dataset: str):
         urllib.request.urlretrieve(url, path)
 
     read_rds = robjects.r["readRDS"]
-    numpy2ri.activate()
 
+    # Convert the R objects to numpy explicitly (rpy2 removed the global
+    # numpy2ri.activate()).
     data = read_rds(path)
-    X = data[0]
-    y = data[1]
+    X = numpy2ri.rpy2py(data[0])
+    y = numpy2ri.rpy2py(data[1])
 
     density = np.sum(X != 0) / X.size
 
@@ -51,7 +52,14 @@ class Dataset(BaseDataset):
     }
 
     install_cmd = "conda"
-    requirements = ["rpy2", "numpy", "scipy", "appdirs", "r-base", "scikit-learn"]
+    requirements = [
+        "conda-forge::r-base",
+        "conda-forge::rpy2",
+        "conda-forge::numpy",
+        "conda-forge::scipy",
+        "conda-forge::appdirs",
+        "conda-forge::scikit-learn",
+    ]
 
     def __init__(self, dataset="brca1", standardize=True):
         super().__init__()
