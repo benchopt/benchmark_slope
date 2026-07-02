@@ -6,19 +6,7 @@ with safe_import_context() as import_ctx:
     from benchopt.helpers.r_lang import import_rpackages
     from rpy2 import robjects
     from rpy2.robjects import numpy2ri, packages
-    from rpy2.robjects.packages import isinstalled
     from scipy import sparse
-
-    # SLOPE is not packaged on conda-forge, so install it at import time from
-    # r-universe (which serves prebuilt binaries for Windows, macOS, and Linux),
-    # falling back to CRAN.
-    if not isinstalled("SLOPE"):
-        packages.importr("utils").install_packages(
-            "SLOPE",
-            repos=robjects.StrVector(
-                ["https://jolars.r-universe.dev", "https://cloud.r-project.org"]
-            ),
-        )
 
     import_rpackages("SLOPE")
 
@@ -28,7 +16,7 @@ class Solver(BaseSolver):
 
     install_cmd = "conda"
     requirements = [
-        "conda-forge::r-base",
+        "conda-forge::r-slope",
         "conda-forge::r-matrix",
         "conda-forge::rpy2",
         "conda-forge::scipy",
