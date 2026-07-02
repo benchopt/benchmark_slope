@@ -2,6 +2,8 @@ from benchopt import BaseSolver, safe_import_context
 from benchopt.stopping_criterion import INFINITY, SufficientProgressCriterion
 
 with safe_import_context() as import_ctx:
+    import sys
+
     import numpy as np
     from benchopt.helpers.r_lang import import_rpackages
     from rpy2 import robjects
@@ -13,11 +15,17 @@ with safe_import_context() as import_ctx:
     # r-universe (which serves prebuilt binaries for Windows, macOS, and Linux),
     # falling back to CRAN.
     if not isinstalled("SLOPE"):
+        install_kwargs = {}
+        # conda-forge's R on Windows defaults to source installs, which need a
+        # compiler toolchain that isn't available; force prebuilt binaries.
+        if sys.platform == "win32":
+            install_kwargs["type"] = "binary"
         packages.importr("utils").install_packages(
             "SLOPE",
             repos=robjects.StrVector(
                 ["https://jolars.r-universe.dev", "https://cloud.r-project.org"]
             ),
+            **install_kwargs,
         )
 
     import_rpackages("SLOPE")

@@ -1,0 +1,89 @@
+name: Windows test
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+    inputs:
+      solver:
+        description: "Solver to test (rSLOPE, sortedl1, ...) or 'all'"
+        required: true
+        default: "rSLOPE"
+      benchopt_version:
+        description: "benchopt to install (e.g. 'benchopt', 'benchopt==1.6.0', 'git+https://github.com/benchopt/benchopt@main')"
+        required: true
+        default: "benchopt"
+
+jobs:
+  windows-test:
+    runs-on: windows-latest
+
+    # `inputs` is only populated for workflow_dispatch; fall back to defaults so
+    # the pull_request/push triggers work too.
+    env:
+      SOLVER: ${{ inputs.solver || 'rSLOPE' }}
+      BENCHOPT_VERSION: ${{ inputs.benchopt_version || 'benchopt' }}
+      # benchopt runs its conda subcommands through $SHELL. On Windows it needs
+      # cmd: it prepends `CALL` to conda (a cmd builtin) and only writes a
+      # proper `.bat` when 'cmd' is in $SHELL. Left as bash, it fails with
+      # "call: command not found". Use `cmd /c` so it runs `cmd /c "script.bat"`.
+      BENCHOPT_SHELL: "cmd /c"
+      # DEBUG: print the exact shell commands benchopt runs (diagnostic).
+      BENCHOPT_DEBUG: "true"
+
+    defaults:
+      run:
+        # setup-miniconda requires a login shell for conda activation to work.
+        shell: bash -el {0}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      # Install Miniforge and use its base env directly. benchopt creates and
+      # manages its own conda envs for the solvers, so we don't create one here
+      # (a named env fails on Windows via setup-miniconda's mamba create).
+      - name: Set up Miniforge (conda-forge by default)
+        uses: conda-incubator/setup-miniconda@v3
+        with:
+          miniforge-version: latest
+
+      # The runner's preinstalled (hostedtoolcache) Python shadows the conda env
+      # on PATH, and `conda run` does not reliably override it on Windows, so
+      # call the base env's interpreter and console script by absolute path.
+      # setup-miniconda's default `test` env is created empty (no Python), so we
+      # use the base Miniforge env, which has Python. benchopt then creates a
+      # dedicated env for the solver deps via `--env-name`.
+      - name: Locate base env executables
+        run: |
+          # $CONDA uses backslashes; convert to forward slashes so Git bash can
+          # resolve and execute the paths.
+          conda_dir="${CONDA//\\//}"
+          echo "PY=$conda_dir/python.exe" >> "$GITHUB_ENV"
+          echo "BENCHOPT=$conda_dir/Scripts/benchopt.exe" >> "$GITHUB_ENV"
+
+      - name: Install benchopt
+        run: |
+          "$PY" -m pip install --upgrade "$BENCHOPT_VERSION"
+
+      - name: Show environment
+        run: |
+          conda info
+          "$BENCHOPT" --version
+
+      - name: Install benchmark requirements
+        run: |
+          if [ "$SOLVER" = "all" ]; then
+            "$BENCHOPT" install . -s all --env-name benchopt_test -y -q
+          else
+            "$BENCHOPT" install . -s "$SOLVER" --env-name benchopt_test -y -q
+          fi
+
+      - name: Run benchmark tests
+        run: |
+          if [ "$SOLVER" = "all" ]; then
+            "$BENCHOPT" test . --env-name benchopt_test
+          else
+            "$BENCHOPT" test . --env-name benchopt_test -k "$SOLVER"
+          fi
