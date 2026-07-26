@@ -15,9 +15,21 @@ on:
     - cron: "42 7 * * 1"
 
 jobs:
-  benchopt_dev:
-    uses: benchopt/template_benchmark/.github/workflows/test_benchmarks.yml@main
-    with:
-      benchopt_branch: benchopt@main
+  test-benchmark:
+    strategy:
+      fail-fast: false
+      matrix:
+        # macos-15-intel (osx-64) is used instead of macos-latest (arm64)
+        # because r-slope is not yet built for osx-arm64 on conda-forge.
+        os: [ubuntu-latest, macos-15-intel, windows-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v7
+      - uses: jolars/setup-benchopt@main
+        with:
+          version: git
+          branch: benchopt@main
+      - run: benchopt test . --env-name bench_test_env -vl
+
   lint:
     uses: benchopt/template_benchmark/.github/workflows/lint_benchmarks.yml@main
