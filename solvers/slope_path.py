@@ -15,7 +15,7 @@ class Solver(BaseSolver):
     references = [
         "Dupuis, X., & Tardivel, P. (2024). The solution path of SLOPE. "
         "Proceedings of The 27th International Conference on Artificial "
-        "Intelligence and Statistics, 238, 775–783. "
+        "Intelligence and Statistics, 238, 775-783. "
         "https://proceedings.mlr.press/v238/dupuis24a.html"
     ]
 

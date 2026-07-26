@@ -22,9 +22,9 @@ class Solver(BaseSolver):
         "conda-forge::scipy",
     ]
     references = [
-        "M. Bogdan, E. van den Berg, C. Sabatti, W. Su, and E. J. Candès, ",
-        "“SLOPE – adaptive variable selection via convex optimization,” ",
-        "Ann Appl Stat, vol. 9, no. 3, pp. 1103–1140, Sep. 2015, ",
+        "M. Bogdan, E. van den Berg, C. Sabatti, W. Su, and E. J. Candes, ",
+        "'SLOPE - adaptive variable selection via convex optimization,' ",
+        "Ann Appl Stat, vol. 9, no. 3, pp. 1103-1140, Sep. 2015, ",
         "doi: 10.1214/15-AOAS842.",
     ]
     support_sparse = True

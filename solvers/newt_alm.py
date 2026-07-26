@@ -27,7 +27,7 @@ class Solver(BaseSolver):
     references = [
         "Luo, Z., Sun, D., Toh, K.-C., & Xiu, N. (2019). Solving the OSCAR and "
         "SLOPE models using a semismooth Newton-based augmented Lagrangian method. "
-        "Journal of Machine Learning Research, 20(106), 1–25."
+        "Journal of Machine Learning Research, 20(106), 1-25."
     ]
 
     def set_objective(self, X, y, alphas, fit_intercept):
@@ -215,7 +215,7 @@ class Solver(BaseSolver):
         inner_solver = copy.deepcopy(self.inner_solver)
 
         if inner_solver == "auto":
-            if m > 10000:  # Very large m - avoid forming m×m matrices
+            if m > 10000:  # Very large m - avoid forming mxm matrices
                 inner_solver = "cg"
             elif m >= 3 * n and n < 5000:
                 inner_solver = "woodbury"

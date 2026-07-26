@@ -14,8 +14,8 @@ class Solver(BaseSolver):
     requirements = ["pip::git+https://github.com/c-elvira/slopescreening"]
 
     references = [
-        "C. Elvira and C. Herzet, “Safe rules for the identification of zeros in ",
-        "the solutions of the SLOPE problem.” arXiv, Oct. 04, 2022. ",
+        "C. Elvira and C. Herzet, 'Safe rules for the identification of zeros in ",
+        "the solutions of the SLOPE problem.' arXiv, Oct. 04, 2022. ",
         "doi: 10.48550/arXiv.2110.11784.",
     ]
     parameters = {
