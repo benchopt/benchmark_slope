@@ -21,7 +21,7 @@ jobs:
       matrix:
         # macos-15-intel (osx-64) is used instead of macos-latest (arm64)
         # because r-slope is not yet built for osx-arm64 on conda-forge.
-        os: [ubuntu-latest, macos-15-intel, windows-latest]
+        os: [ubuntu-latest, macos-latest, windows-latest]
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v7
