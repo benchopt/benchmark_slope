@@ -2,7 +2,25 @@ from benchopt import BaseSolver, safe_import_context
 from benchopt.stopping_criterion import INFINITY, SufficientProgressCriterion
 
 with safe_import_context() as import_ctx:
+    import os
+    import sys
+
     import numpy as np
+
+    # On Windows, GitHub runners (and many statisticians' machines) ship a
+    # system R whose bin\x64 is on PATH. rpy2 loads that R.dll by name, so the
+    # conda-forge SLOPE and stats DLLs then bind to the wrong R runtime and
+    # fail with "LoadLibrary failure: The specified procedure could not be
+    # found." Pin R_HOME to the conda env and put its R bin on the DLL search
+    # path before rpy2 is imported so the matching R.dll is the one that loads.
+    if os.name == "nt":
+        r_home = os.path.join(sys.prefix, "Lib", "R")
+        r_bin = os.path.join(r_home, "bin", "x64")
+        os.environ["R_HOME"] = r_home
+        if os.path.isdir(r_bin):
+            os.add_dll_directory(r_bin)
+            os.environ["PATH"] = r_bin + os.pathsep + os.environ["PATH"]
+
     from benchopt.helpers.r_lang import import_rpackages
     from rpy2 import robjects
     from rpy2.robjects import numpy2ri, packages
