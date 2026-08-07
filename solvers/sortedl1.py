@@ -10,7 +10,7 @@ class Solver(BaseSolver):
     name = "sortedl1"
     sampling_strategy = "tolerance"
     install_cmd = "conda"
-    requirements = ["pip:sortedl1"]
+    requirements = ["pip::sortedl1"]
     parameters = {
         "cd_type": ["cyclical", "permuted"],
         "update_clusters": [True, False],
