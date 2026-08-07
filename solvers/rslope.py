@@ -2,23 +2,29 @@ from benchopt import BaseSolver, safe_import_context
 from benchopt.stopping_criterion import INFINITY, SufficientProgressCriterion
 
 with safe_import_context() as import_ctx:
+    import os
+    import sys
+
     import numpy as np
+
+    # On Windows, GitHub runners (and many statisticians' machines) ship a
+    # system R whose bin\x64 is on PATH. rpy2 loads that R.dll by name, so the
+    # conda-forge SLOPE and stats DLLs then bind to the wrong R runtime and
+    # fail with "LoadLibrary failure: The specified procedure could not be
+    # found." Pin R_HOME to the conda env and put its R bin on the DLL search
+    # path before rpy2 is imported so the matching R.dll is the one that loads.
+    if os.name == "nt":
+        r_home = os.path.join(sys.prefix, "Lib", "R")
+        r_bin = os.path.join(r_home, "bin", "x64")
+        os.environ["R_HOME"] = r_home
+        if os.path.isdir(r_bin):
+            os.add_dll_directory(r_bin)
+            os.environ["PATH"] = r_bin + os.pathsep + os.environ["PATH"]
+
     from benchopt.helpers.r_lang import import_rpackages
     from rpy2 import robjects
     from rpy2.robjects import numpy2ri, packages
-    from rpy2.robjects.packages import isinstalled
     from scipy import sparse
-
-    # SLOPE is not packaged on conda-forge, so install it at import time from
-    # r-universe (which serves prebuilt binaries for Windows, macOS, and Linux),
-    # falling back to CRAN.
-    if not isinstalled("SLOPE"):
-        packages.importr("utils").install_packages(
-            "SLOPE",
-            repos=robjects.StrVector(
-                ["https://jolars.r-universe.dev", "https://cloud.r-project.org"]
-            ),
-        )
 
     import_rpackages("SLOPE")
 
@@ -28,15 +34,21 @@ class Solver(BaseSolver):
 
     install_cmd = "conda"
     requirements = [
-        "conda-forge::r-base",
+        "conda-forge::r-slope",
         "conda-forge::r-matrix",
         "conda-forge::rpy2",
         "conda-forge::scipy",
+        # On Windows, rpy2 runs `R CMD config --ldflags` at import time to find
+        # the directory holding R.dll. R implements `CMD config` by querying
+        # etc/Makeconf with make, so without make on PATH it reports "R was not
+        # built as a library" and rpy2 fails with a TypeError. Windows has no
+        # system make, so pull it in from conda-forge.
+        "conda-forge::make",
     ]
     references = [
-        "M. Bogdan, E. van den Berg, C. Sabatti, W. Su, and E. J. Candès, ",
-        "“SLOPE – adaptive variable selection via convex optimization,” ",
-        "Ann Appl Stat, vol. 9, no. 3, pp. 1103–1140, Sep. 2015, ",
+        "M. Bogdan, E. van den Berg, C. Sabatti, W. Su, and E. J. Candes, ",
+        "'SLOPE - adaptive variable selection via convex optimization,' ",
+        "Ann Appl Stat, vol. 9, no. 3, pp. 1103-1140, Sep. 2015, ",
         "doi: 10.1214/15-AOAS842.",
     ]
     support_sparse = True

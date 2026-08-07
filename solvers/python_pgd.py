@@ -34,9 +34,9 @@ class Solver(BaseSolver):
         "vol. 2, no. 1, pp. 183-202 (2009)",
         "Barzilai, J., & Borwein, J. M. (1988). "
         "Two-point step size gradient methods. IMA Journal of Numerical "
-        "Analysis, 8(1), 141–148. https://doi.org/10.1093/imanum/8.1.141",
+        "Analysis, 8(1), 141-148. https://doi.org/10.1093/imanum/8.1.141",
         "Anderson, D. G. (1965). Iterative procedures for nonlinear "
-        "integral equations. J. ACM, 12(4), 547–560. "
+        "integral equations. J. ACM, 12(4), 547-560. "
         "https://doi.org/10.1145/321296.321305",
     ]
 

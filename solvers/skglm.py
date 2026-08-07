@@ -20,9 +20,9 @@ class Solver(BaseSolver):
 
     references = [
         "Q. Bertrand, Q. Klopfenstein, P.-A. Bannier, G. Gidel, and M. Massias,"
-        "“Beyond L1: faster and better sparse models with skglm,” in Advances in"
+        "'Beyond L1: faster and better sparse models with skglm,' in Advances in"
         "Neural Information Processing Systems 35, New Orleans, USA: Curran Associates,"
-        "Inc., Dec. 2022, pp. 38950–38965. Accessed: Jan. 08, 2024."
+        "Inc., Dec. 2022, pp. 38950-38965. Accessed: Jan. 08, 2024."
     ]
 
     def set_objective(self, X, y, alphas, fit_intercept):
