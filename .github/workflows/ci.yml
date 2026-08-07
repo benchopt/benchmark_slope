@@ -27,35 +27,6 @@ jobs:
         with:
           version: git
           branch: benchopt@main
-      # benchopt drives conda through `cmd /c`, and conda activation inlines the
-      # whole PATH into the batch script. The runner's PATH is long enough that
-      # installing the pip solvers overflows cmd's 8191-char command-line limit
-      # ("The input line is too long"). Rebuild a minimal PATH with only what
-      # benchopt needs (conda/mamba, git for the git+ solver, and Windows
-      # system dirs); this also drops the system R that would otherwise shadow
-      # the conda-forge R.dll.
-      - name: Shorten PATH on Windows to avoid the cmd.exe command-line limit
-        if: runner.os == 'Windows'
-        shell: pwsh
-        run: |
-          $conda = $env:CONDA
-          if (-not $conda) { throw "CONDA is not set; cannot rebuild PATH" }
-          $paths = @(
-            "$conda\envs\benchopt",
-            "$conda\envs\benchopt\Scripts",
-            "$conda\envs\benchopt\Library\bin",
-            "$conda",
-            "$conda\Scripts",
-            "$conda\Library\bin",
-            "$conda\condabin",
-            "C:\Program Files\Git\cmd",
-            "C:\Program Files\Git\bin",
-            "$env:SystemRoot\System32",
-            "$env:SystemRoot",
-            "$env:SystemRoot\System32\WindowsPowerShell\v1.0",
-            "$env:SystemRoot\System32\OpenSSH"
-          )
-          "PATH=$($paths -join ';')" >> $env:GITHUB_ENV
       - run: benchopt test . --env-name bench_test_env -vl
 
   lint:
