@@ -59,6 +59,9 @@ class Dataset(BaseDataset):
         "conda-forge::scipy",
         "conda-forge::appdirs",
         "conda-forge::scikit-learn",
+        # rpy2 shells out to `R CMD config --ldflags` when imported on Windows,
+        # and R needs make to answer that. See solvers/rslope.py.
+        "conda-forge::make",
     ]
 
     def __init__(self, dataset="brca1", standardize=True):
