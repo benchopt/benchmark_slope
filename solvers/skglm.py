@@ -16,7 +16,7 @@ class Solver(BaseSolver):
     sampling_strategy = "iteration"
 
     install_cmd = "conda"
-    requirements = ["pip:skglm"]
+    requirements = ["pip::skglm"]
 
     references = [
         "Q. Bertrand, Q. Klopfenstein, P.-A. Bannier, G. Gidel, and M. Massias,"
