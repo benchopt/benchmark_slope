@@ -47,7 +47,10 @@ class Objective(BaseObjective):
         )
 
         # compute dual
-        theta = diff
+        theta = diff.copy()
+        if self.fit_intercept:
+            # An unpenalized intercept imposes sum(theta) = 0 in the dual.
+            theta -= np.mean(theta)
         theta /= max(1, self._dual_norm_slope(theta, self.alphas))
         d_obj = (norm(y) ** 2 - norm(y - theta * n_samples) ** 2) / (2 * n_samples)
 
