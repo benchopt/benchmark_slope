@@ -12,7 +12,10 @@ let
     # Benchopt 1.9.1 mistakes installations below the checkout for editable
     # installs when it creates test environments.
     installationPath = "~/.local/state/devenv/benchmark_slope/conda";
-    extraPkgs = [ pkgs.git ];
+    extraPkgs = [
+      pkgs.git
+      pkgs.which
+    ];
   };
   condaShell = lib.getExe conda;
 in
