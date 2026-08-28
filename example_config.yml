@@ -6,7 +6,7 @@ dataset:
 
 solver:
   - PGD[prox=prox_isotonic]
-  - sortedl1
+  - sortedl1[cd_type=permuted]
 
 # note: use more repetitions to have quantiles on the plot
 n-repetitions: 1

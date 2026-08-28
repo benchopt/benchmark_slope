@@ -13,7 +13,6 @@ class Solver(BaseSolver):
     requirements = ["pip::sortedl1"]
     parameters = {
         "cd_type": ["cyclical", "permuted"],
-        "update_clusters": [True, False],
     }
 
     references = [
@@ -36,7 +35,6 @@ class Solver(BaseSolver):
             fit_intercept=self.fit_intercept,
             max_iter=1_000_000,
             hybrid_cd_type=self.cd_type,
-            update_clusters=self.update_clusters,
         )
 
     def run(self, tol):
