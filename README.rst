@@ -29,6 +29,25 @@ a new conda environment and install benchopt in it:
    $ conda activate benchopt
    $ pip install -U benchopt
 
+NixOS
+~~~~~
+
+Conda packages cannot normally run directly on NixOS. The included devenv
+configuration supplies a compatible FHS environment while leaving dependency
+management to Benchopt. Enter the shell and install Benchopt once:
+
+.. code-block::
+
+   $ devenv shell
+   $ benchopt-setup
+
+The ``benchopt`` wrapper then runs commands inside the Conda environment. The
+benchmark's Conda base environment lives under
+``~/.local/state/devenv/benchmark_slope/conda``. It must remain outside the
+checkout because Benchopt 1.9.1 misidentifies checkout-local installations
+when creating test environments. Conda's package cache and secondary
+environments remain in devenv's ignored state directory.
+
 Installing the Benchmark
 ------------------------
 
