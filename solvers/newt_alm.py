@@ -16,6 +16,9 @@ if import_ctx.failed_import:
         return f
 
 
+MAX_STANDARD_SAMPLES = 10_000
+
+
 class Solver(BaseSolver):
     name = "Newt-ALM"
     sampling_strategy = "callback"
@@ -33,6 +36,16 @@ class Solver(BaseSolver):
     def set_objective(self, X, y, alphas, fit_intercept):
         self.X, self.y, self.lambdas = X, y, alphas
         self.fit_intercept = fit_intercept
+
+    def skip(self, X, y, alphas, fit_intercept):
+        n_samples = X.shape[0]
+        if self.inner_solver == "standard" and n_samples > MAX_STANDARD_SAMPLES:
+            return True, (
+                f"{self.name}'s standard inner solver would form a dense "
+                f"{n_samples}-by-{n_samples} system"
+            )
+
+        return False, None
 
     def warm_up(self):
         self.run_once()
@@ -215,7 +228,7 @@ class Solver(BaseSolver):
         inner_solver = copy.deepcopy(self.inner_solver)
 
         if inner_solver == "auto":
-            if m > 10000:  # Very large m - avoid forming mxm matrices
+            if m > MAX_STANDARD_SAMPLES:
                 inner_solver = "cg"
             elif m >= 3 * n and n < 5000:
                 inner_solver = "woodbury"
