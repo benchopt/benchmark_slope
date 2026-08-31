@@ -6,7 +6,7 @@ with safe_import_context() as import_ctx:
     from sortedl1 import Slope
 
 
-MIN_TOLERANCE = 1e-6
+MIN_TOLERANCE = 1e-7
 
 
 class MinimumToleranceCriterion(SufficientProgressCriterion):
@@ -20,6 +20,10 @@ class MinimumToleranceCriterion(SufficientProgressCriterion):
             stop_val,
             objective_list,
         )
+        if stop and status == "done":
+            next_stop_val = self.get_next_stop_val(stop_val)
+            if next_stop_val >= self.min_tol:
+                return False, "running", next_stop_val
         if not stop and next_stop_val < self.min_tol:
             return True, "done", stop_val
         return stop, status, next_stop_val
