@@ -1,5 +1,5 @@
 from benchopt import BaseSolver, safe_import_context
-from benchopt.stopping_criterion import INFINITY, SufficientProgressCriterion
+from benchopt.stopping_criterion import INFINITY
 
 with safe_import_context() as import_ctx:
     import os
@@ -52,10 +52,6 @@ class Solver(BaseSolver):
         "doi: 10.1214/15-AOAS842.",
     ]
     support_sparse = True
-
-    stopping_criterion = SufficientProgressCriterion(
-        patience=5, eps=1e-38, strategy="tolerance"
-    )
 
     def set_objective(self, X, y, alphas, fit_intercept):
         if sparse.issparse(X):
