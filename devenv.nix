@@ -23,6 +23,7 @@ in
   packages = [ conda ];
 
   env = {
+    BENCHOPT_DEFAULT_TIMEOUT = "30";
     CONDA_ENVS_PATH = "${config.devenv.state}/conda/envs";
     CONDA_PKGS_DIRS = "${config.devenv.state}/conda/pkgs";
     PYTHONNOUSERSITE = "1";

@@ -1,38 +1,14 @@
 from benchopt import BaseSolver, safe_import_context
-from benchopt.stopping_criterion import INFINITY, SufficientProgressCriterion
+from benchopt.stopping_criterion import INFINITY
 
 with safe_import_context() as import_ctx:
     import numpy as np
     from sortedl1 import Slope
 
 
-MIN_TOLERANCE = 1e-7
-
-
-class MinimumToleranceCriterion(SufficientProgressCriterion):
-    def __init__(self, min_tol=MIN_TOLERANCE, **kwargs):
-        super().__init__(**kwargs)
-        self.min_tol = min_tol
-        self.kwargs["min_tol"] = min_tol
-
-    def should_stop(self, stop_val, objective_list):
-        stop, status, next_stop_val = super().should_stop(
-            stop_val,
-            objective_list,
-        )
-        if stop and status == "done":
-            next_stop_val = self.get_next_stop_val(stop_val)
-            if next_stop_val >= self.min_tol:
-                return False, "running", next_stop_val
-        if not stop and next_stop_val < self.min_tol:
-            return True, "done", stop_val
-        return stop, status, next_stop_val
-
-
 class Solver(BaseSolver):
     name = "sortedl1"
     sampling_strategy = "tolerance"
-    stopping_criterion = MinimumToleranceCriterion()
     install_cmd = "conda"
     requirements = ["pip::sortedl1"]
     parameters = {
