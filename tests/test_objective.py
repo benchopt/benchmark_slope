@@ -39,3 +39,21 @@ def test_stops_at_target_relative_duality_gap(gap, should_stop):
 def test_target_relative_duality_gap_must_be_positive():
     with pytest.raises(ValueError, match="strictly positive"):
         Objective(target_rel_duality_gap=0.0)
+
+
+def test_objective_criterion_supports_mixed_sampling_strategies():
+    class DummySolver:
+        def __init__(self, sampling_strategy):
+            self.sampling_strategy = sampling_strategy
+
+    criterion = TargetObjectiveCriterion()
+    iteration_runner = criterion.get_runner_instance(
+        solver=DummySolver("iteration")
+    )
+    tolerance_runner = criterion.get_runner_instance(
+        solver=DummySolver("tolerance")
+    )
+
+    assert iteration_runner.strategy == "iteration"
+    assert tolerance_runner.strategy == "tolerance"
+    assert criterion.strategy is None

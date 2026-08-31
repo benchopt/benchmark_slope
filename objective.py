@@ -31,6 +31,24 @@ class TargetObjectiveCriterion(StoppingCriterion):
             minimize=minimize,
         )
 
+    def get_runner_instance(self, max_runs=1, solver=None, **runner_kwargs):
+        strategy = self.strategy
+        if strategy is None:
+            strategy = solver.sampling_strategy or "iteration"
+
+        criterion = self.__class__(
+            target_key=self.target_key,
+            strategy=strategy,
+            key_to_monitor=self.key_to_monitor,
+            minimize=self.minimize,
+        )
+        return StoppingCriterion.get_runner_instance(
+            criterion,
+            max_runs=max_runs,
+            solver=solver,
+            **runner_kwargs,
+        )
+
     def check_convergence(self, objective_list):
         result = objective_list[-1]
         value = result[self.key_to_monitor_]
