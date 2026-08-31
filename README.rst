@@ -74,28 +74,24 @@ Or you can install only a subset of solvers by specifying them with the ``-s`` o
 Running the Benchmark
 ---------------------
 
-To run the benchmark with a 30-second cap for each solver, use the
-`benchopt run` command:
+To run the benchmark, simply use the `benchopt run` command:
 
 .. code-block::
 
-	$ benchopt run . --timeout 30
+	$ benchopt run .
 
 By default, all solvers and datasets are run. You can restrict the benchmark to some solvers or datasets, e.g.:
 
 .. code-block::
 
-	$ benchopt run -s PGD[prox=prox_fast_stack] -d libsvm[dataset=real-sim,standardize=True] --timeout 30
+	$ benchopt run -s PGD[prox=prox_fast_stack] -d libsvm[dataset=real-sim,standardize=True]
 
 You can also specify a YAML configuration file to set the parameters of the benchmark.
 An example config is provided in <example_config.yml>.
 
 .. code-block::
 
-	$ benchopt run --config example_config.yml . --timeout 30
-
-The devenv shell sets the same 30-second default when ``--timeout`` is omitted.
-Pass another value to ``--timeout`` or use ``--no-timeout`` to override it.
+	$ benchopt run --config example_config.yml .
 
 Use `benchopt run -h` for more details about these options, or visit https://benchopt.github.io/api.html.
 
